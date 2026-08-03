@@ -1,0 +1,30 @@
+:root {
+  /* Biến màu của bạn */
+  --c-main:#1A7A5E;
+  --c-light:#2EAD84;
+  --c-pale:#E8FFF5;
+  --c-border:#8ED8BB;
+  --c-text:#0F4535;
+  --c-bg:#F0FAF5;
+  --c-dark:#0A2A1E;
+  --c-muted:#5A9E80;
+  --c-white:#FFFFFF;
+
+  /* Font mặc định */
+  font-family: "Nunito", sans-serif;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+body{
+    min-height:100dvh;
+    background:var(--c-bg);
+    font-family:inherit;
+}
