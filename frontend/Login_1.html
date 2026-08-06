@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Đăng nhập - Grean Melody</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --c-main:#1A7A5E;
+  --c-light:#2EAD84;
+  --c-pale:#E8FFF5;
+  --c-border:#8ED8BB;
+  --c-text:#0F4535;
+  --c-bg:#F0FAF5;
+  --c-dark:#0A2A1E;
+  --c-muted:#5A9E80;
+  --c-white:#FFFFFF;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--c-bg);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+.auth-wrap{
+  width:100%;
+  max-width:400px;
+}
+.logo-area{
+  text-align:center;
+  margin-bottom:22px;
+}
+.logo-circle{
+  width:64px;height:64px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--c-main),var(--c-light));
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 12px;
+  font-size:28px;
+  box-shadow:0 8px 20px rgba(26,122,94,.25);
+}
+.logo-area h1{
+  font-size:1.3rem;
+  font-weight:900;
+  color:var(--c-dark);
+}
+.logo-area p{
+  font-size:.85rem;
+  color:var(--c-muted);
+  font-weight:600;
+  margin-top:4px;
+}
+.card{
+  background:var(--c-white);
+  border:1.5px solid var(--c-border);
+  border-radius:20px;
+  padding:26px 24px;
+  box-shadow:0 10px 30px rgba(15,69,53,.08);
+}
+.tabs{
+  display:flex;
+  background:var(--c-pale);
+  border-radius:14px;
+  padding:4px;
+  margin-bottom:22px;
+}
+.tab-btn{
+  flex:1;
+  border:none;
+  background:transparent;
+  padding:10px 0;
+  font-family:inherit;
+  font-weight:800;
+  font-size:.9rem;
+  color:var(--c-muted);
+  border-radius:11px;
+  cursor:pointer;
+  transition:.2s;
+}
+.tab-btn.active{
+  background:var(--c-main);
+  color:var(--c-white);
+  box-shadow:0 4px 10px rgba(26,122,94,.25);
+}
+.form-panel{display:none;}
+.form-panel.active{display:block;}
+.field{
+  margin-bottom:16px;
+}
+.field label{
+  display:block;
+  font-size:.8rem;
+  font-weight:800;
+  color:var(--c-text);
+  margin-bottom:6px;
+}
+.field input{
+  width:100%;
+  padding:12px 14px;
+  font-family:inherit;
+  font-size:.95rem;
+  font-weight:600;
+  color:var(--c-dark);
+  background:var(--c-pale);
+  border:1.5px solid var(--c-border);
+  border-radius:12px;
+  outline:none;
+  transition:.2s;
+}
+.field input::placeholder{
+  color:var(--c-muted);
+  font-weight:600;
+}
+.field input:focus{
+  border-color:var(--c-main);
+  background:var(--c-white);
+  box-shadow:0 0 0 3px rgba(46,173,132,.15);
+}
+.row-between{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:20px;
+  font-size:.8rem;
+}
+.remember{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:var(--c-muted);
+  font-weight:700;
+}
+.remember input{accent-color:var(--c-main);}
+.link-forgot{
+  color:var(--c-main);
+  font-weight:800;
+  text-decoration:none;
+}
+.btn-submit{
+  width:100%;
+  padding:13px 0;
+  border:none;
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--c-main),var(--c-light));
+  color:var(--c-white);
+  font-family:inherit;
+  font-weight:900;
+  font-size:.95rem;
+  cursor:pointer;
+  box-shadow:0 8px 18px rgba(26,122,94,.28);
+  transition:.15s;
+}
+.btn-submit:active{transform:scale(.97);}
+.divider{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:20px 0;
+  color:var(--c-muted);
+  font-size:.75rem;
+  font-weight:700;
+}
+.divider::before,.divider::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:var(--c-border);
+}
+.socials{
+  display:flex;
+  gap:10px;
+}
+.btn-social{
+  flex:1;
+  padding:10px 0;
+  border:1.5px solid var(--c-border);
+  background:var(--c-white);
+  border-radius:12px;
+  font-family:inherit;
+  font-weight:800;
+  font-size:.82rem;
+  color:var(--c-text);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+.terms{
+  font-size:.75rem;
+  color:var(--c-muted);
+  font-weight:600;
+  text-align:center;
+  margin-top:16px;
+}
+.terms a{color:var(--c-main);font-weight:800;text-decoration:none;}
+
+/* OTP */
+.otp-icon{
+  width:56px;height:56px;
+  border-radius:50%;
+  background:var(--c-pale);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;
+  margin:0 auto 14px;
+}
+.otp-title{
+  text-align:center;
+  font-weight:900;
+  font-size:1.05rem;
+  color:var(--c-dark);
+  margin-bottom:6px;
+}
+.otp-sub{
+  text-align:center;
+  font-size:.82rem;
+  font-weight:600;
+  color:var(--c-muted);
+  margin-bottom:22px;
+  line-height:1.5;
+}
+.otp-sub b{color:var(--c-text);}
+.otp-boxes{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  margin-bottom:18px;
+}
+.otp-boxes input{
+  width:44px;
+  height:52px;
+  text-align:center;
+  font-size:1.3rem;
+  font-weight:900;
+  color:var(--c-dark);
+  background:var(--c-pale);
+  border:1.5px solid var(--c-border);
+  border-radius:12px;
+  outline:none;
+  transition:.15s;
+}
+.otp-boxes input:focus{
+  border-color:var(--c-main);
+  background:var(--c-white);
+  box-shadow:0 0 0 3px rgba(46,173,132,.15);
+}
+.otp-boxes input.filled{
+  border-color:var(--c-main);
+  background:var(--c-white);
+}
+.otp-error{
+  text-align:center;
+  font-size:.78rem;
+  font-weight:800;
+  color:#D64545;
+  min-height:16px;
+  margin-bottom:12px;
+}
+.otp-resend{
+  text-align:center;
+  font-size:.8rem;
+  font-weight:700;
+  color:var(--c-muted);
+  margin-top:16px;
+}
+.otp-resend a{
+  color:var(--c-main);
+  font-weight:900;
+  text-decoration:none;
+  cursor:pointer;
+}
+.otp-resend a.disabled{
+  color:var(--c-border);
+  pointer-events:none;
+}
+.link-back{
+  display:block;
+  text-align:center;
+  font-size:.8rem;
+  font-weight:800;
+  color:var(--c-muted);
+  text-decoration:none;
+  margin-top:18px;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="auth-wrap">
+
+  <div class="logo-area">
+    <div class="logo-circle">🎵</div>
+    <h1>Grean Melody</h1>
+    <p>Luyện tai nghe nhạc mỗi ngày</p>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="chuyenTab('dangnhap')">Đăng nhập</button>
+      <button class="tab-btn" onclick="chuyenTab('dangky')">Đăng ký</button>
+    </div>
+
+    <!-- ĐĂNG NHẬP -->
+    <div class="form-panel active" id="panel-dangnhap">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" placeholder="ban@email.com">
+      </div>
+      <div class="field">
+        <label>Mật khẩu</label>
+        <input type="password" placeholder="Nhập mật khẩu">
+      </div>
+      <div class="row-between">
+        <label class="remember"><input type="checkbox"> Ghi nhớ tôi</label>
+        <a class="link-forgot" href="#">Quên mật khẩu?</a>
+      </div>
+      <button class="btn-submit">Đăng nhập</button>
+
+      <div class="divider">HOẶC</div>
+      <div class="socials">
+        <button class="btn-social">🔵 Google</button>
+        <button class="btn-social">⚫ Facebook</button>
+      </div>
+    </div>
+
+    <!-- ĐĂNG KÝ -->
+    <div class="form-panel" id="panel-dangky">
+      <div class="field">
+        <label>Tên hiển thị</label>
+        <input type="text" placeholder="Tên của bạn">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" placeholder="ban@email.com">
+      </div>
+      <div class="field">
+        <label>Mật khẩu</label>
+        <input type="password" placeholder="Tạo mật khẩu">
+      </div>
+      <div class="field">
+        <label>Xác nhận mật khẩu</label>
+        <input type="password" placeholder="Nhập lại mật khẩu">
+      </div>
+      <button class="btn-submit">Tạo tài khoản</button>
+
+      <div class="terms">
+        Bằng việc đăng ký, bạn đồng ý với <a href="#">Điều khoản</a> & <a href="#">Chính sách</a>.
+      </div>
+    </div>
+
+    <!-- VERIFY OTP -->
+    <div class="form-panel" id="panel-otp">
+      <div class="otp-icon">📩</div>
+      <div class="otp-title">Xác minh email</div>
+      <div class="otp-sub">Nhập mã 6 số vừa được gửi tới<br><b id="otp-email-hien">ban@email.com</b></div>
+
+      <div class="otp-boxes">
+        <input type="text" inputmode="numeric" maxlength="1">
+        <input type="text" inputmode="numeric" maxlength="1">
+        <input type="text" inputmode="numeric" maxlength="1">
+        <input type="text" inputmode="numeric" maxlength="1">
+        <input type="text" inputmode="numeric" maxlength="1">
+        <input type="text" inputmode="numeric" maxlength="1">
+      </div>
+
+      <div class="otp-error" id="otp-error"></div>
+
+      <button class="btn-submit" onclick="xacNhanOtp()">Xác nhận</button>
+
+      <div class="otp-resend">
+        Chưa nhận được mã? <a id="otp-resend-link" onclick="guiLaiOtp()">Gửi lại</a>
+        <span id="otp-timer"></span>
+      </div>
+
+      <a class="link-back" onclick="chuyenTab('dangky')">← Quay lại đăng ký</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function chuyenTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.form-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector('.tabs').style.display = (tab==='otp') ? 'none' : 'flex';
+
+  if(tab==='dangnhap'){
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    document.getElementById('panel-dangnhap').classList.add('active');
+  }else if(tab==='dangky'){
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    document.getElementById('panel-dangky').classList.add('active');
+  }else if(tab==='otp'){
+    document.getElementById('panel-otp').classList.add('active');
+    const emailInput = document.querySelector('#panel-dangky input[type="email"]');
+    if(emailInput && emailInput.value) document.getElementById('otp-email-hien').textContent = emailInput.value;
+    resetOtpBoxes();
+    batDauDemNguoc();
+  }
+}
+
+// Khi bấm nút "Tạo tài khoản" ở panel đăng ký -> chuyển qua verify OTP
+document.querySelector('#panel-dangky .btn-submit').addEventListener('click', function(){
+  chuyenTab('otp');
+});
+
+// --- Xử lý 6 ô nhập OTP ---
+const otpInputs = document.querySelectorAll('.otp-boxes input');
+otpInputs.forEach((input, index)=>{
+  input.addEventListener('input', ()=>{
+    input.value = input.value.replace(/[^0-9]/g,'');
+    if(input.value){
+      input.classList.add('filled');
+      if(index < otpInputs.length - 1) otpInputs[index+1].focus();
+    }else{
+      input.classList.remove('filled');
+    }
+    document.getElementById('otp-error').textContent = '';
+  });
+
+  input.addEventListener('keydown', (e)=>{
+    if(e.key === 'Backspace' && !input.value && index > 0){
+      otpInputs[index-1].focus();
+    }
+  });
+
+  // Cho phép dán cả mã 6 số cùng lúc
+  input.addEventListener('paste', (e)=>{
+    e.preventDefault();
+    const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g,'').slice(0,6);
+    paste.split('').forEach((char, i)=>{
+      if(otpInputs[i]){
+        otpInputs[i].value = char;
+        otpInputs[i].classList.add('filled');
+      }
+    });
+    if(paste.length) otpInputs[Math.min(paste.length,6)-1].focus();
+  });
+});
+
+function resetOtpBoxes(){
+  otpInputs.forEach(i=>{ i.value=''; i.classList.remove('filled'); });
+  document.getElementById('otp-error').textContent = '';
+  otpInputs[0].focus();
+}
+
+function xacNhanOtp(){
+  const ma = Array.from(otpInputs).map(i=>i.value).join('');
+  if(ma.length < 6){
+    document.getElementById('otp-error').textContent = 'Vui lòng nhập đủ 6 số.';
+    return;
+  }
+  // TODO: gọi API backend kiểm tra mã OTP tại đây
+  document.getElementById('otp-error').style.color = 'var(--c-main)';
+  document.getElementById('otp-error').textContent = 'Xác minh thành công! (demo giao diện)';
+}
+
+// --- Đếm ngược gửi lại mã ---
+function batDauDemNguoc(){
+  let demNguocId = null;
+  clearInterval(demNguocId);
+  let second = 60;
+  const link = document.getElementById('otp-resend-link');
+  const timer = document.getElementById('otp-timer');
+  link.classList.add('disabled');
+
+  demNguocId = setInterval(()=>{
+    second--;
+    timer.textContent = ` (${second}s)`;
+    if(second <= 0){
+      clearInterval(demNguocId);
+      timer.textContent = '';
+      link.classList.remove('disabled');
+    }
+  },1000);
+}
+
+function guiLaiOtp(){
+  if(document.getElementById('otp-resend-link').classList.contains('disabled')) return;
+  resetOtpBoxes();
+  batDauDemNguoc();
+}
+</script>
+
+</body>
+</html>
