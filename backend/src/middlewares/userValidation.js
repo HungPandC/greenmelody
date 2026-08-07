@@ -164,7 +164,6 @@ export const resetPasswordValidation = [
 
 export function authenticate(req, res, next) {
     const token = req.cookies.accessToken;
-
     if (!token) {
         return res.status(401).json({
             message: "Chưa đăng nhập"
@@ -178,7 +177,6 @@ export function authenticate(req, res, next) {
         );
 
         req.user = decoded;
-
         next();
     } catch(error) {
         if(error.name === "TokenExpiredError"){
@@ -196,7 +194,7 @@ export function authenticate(req, res, next) {
                 const accessToken = jwt.sign(
                     { userId: decodedRefresh.userId },
                     process.env.JWT_SECRET_ACCESS,
-                    { expiresIn: "15m" }
+                    { expiresIn: "30s" }
                 );
                 res.cookie("accessToken", accessToken, {
                     httpOnly: true,

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Green Melody</title>
+<style>
+  :root{
+    --green:#2e9e5b;
+    --green-dark:#1f7a44;
+    --green-light:#eaf7ee;
+    --bg:#f7f8f6;
+    --card:#ffffff;
+    --border:#e7e9e4;
+    --text:#1c2b21;
+    --text-mut:#7a8a7d;
+    --blue:#3b82f6;
+    --blue-light:#eaf1ff;
+    --orange:#f59e0b;
+    --orange-light:#fdf2e1;
+    --purple:#8b5cf6;
+    --purple-light:#f2edfd;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    display:flex;
+    min-height:100vh;
+  }
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:270px;
+    background:#fff;
+    border-right:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    padding:26px 18px;
+    flex-shrink:0;
+  }
+  .brand{display:flex;align-items:center;gap:12px;padding:0 8px 28px;}
+  .brand-icon{
+    width:44px;height:44px;border-radius:12px;
+    background:var(--green);
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:21px;
+  }
+  .brand-name{font-weight:800;font-size:18px;}
+  .brand-sub{font-size:12px;color:var(--text-mut);}
+  nav{display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+  .nav-item{
+    display:flex;align-items:center;gap:14px;
+    padding:13px 14px;border-radius:12px;
+    color:var(--text-mut);font-size:15.5px;font-weight:600;
+    cursor:pointer;
+  }
+  .nav-item .ic{width:22px;text-align:center;font-size:17px;}
+  .nav-item.active{background:var(--green-light);color:var(--green-dark);font-weight:700;}
+  .nav-item:hover:not(.active){background:#f2f3f0;}
+  .sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;gap:6px;}
+  .promo-card{
+    margin-top:20px;
+    background:linear-gradient(160deg,#dff3e4,#eef8ee);
+    border-radius:18px;
+    padding:20px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .promo-mascot{
+    width:64px;height:64px;border-radius:50%;
+    background:var(--green);
+    margin:0 auto 12px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:30px;color:#fff;
+  }
+  .promo-title{font-weight:800;font-size:15px;margin-bottom:5px;}
+  .promo-text{font-size:12.5px;color:var(--text-mut);margin-bottom:14px;line-height:1.5;}
+  .promo-btn{
+    background:var(--green);color:#fff;border:none;
+    padding:12px;border-radius:11px;width:100%;
+    font-weight:700;font-size:14px;cursor:pointer;
+  }
+
+  /* ---------- Main ---------- */
+  .main{flex:1;padding:24px 28px;max-width:1000px;}
+  .topbar{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    margin-bottom:20px;flex-wrap:wrap;gap:14px;
+  }
+  .greeting h1{font-size:24px;font-weight:800;margin-bottom:4px;}
+  .greeting p{color:var(--text-mut);font-size:14px;}
+  .stat-pills{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .pill{
+    background:#fff;border:1px solid var(--border);
+    border-radius:12px;padding:8px 14px;
+    display:flex;align-items:center;gap:8px;font-size:13px;
+  }
+  .pill .pv{font-weight:700;font-size:14px;}
+  .pill .pl{color:var(--text-mut);font-size:11px;display:block;}
+  .avatar-round{
+    width:40px;height:40px;border-radius:50%;
+    background:#d6e9da;display:flex;align-items:center;justify-content:center;
+    font-size:16px;font-weight:700;color:var(--green-dark);
+    border:2px solid #fff;box-shadow:0 0 0 1px var(--border);
+  }
+
+  /* Hero */
+  .hero{
+    background:linear-gradient(120deg,var(--green-dark),var(--green) 70%);
+    border-radius:20px;
+    padding:26px 30px;
+    color:#fff;
+    margin-bottom:22px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-left{position:relative;z-index:2;max-width:420px;}
+  .hero-eyebrow{font-size:13px;opacity:.85;margin-bottom:6px;}
+  .hero-title{font-size:26px;font-weight:800;margin-bottom:6px;}
+  .hero-sub{font-size:13px;opacity:.9;margin-bottom:16px;}
+  .progress-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+  .progress-track{
+    flex:1;height:8px;background:rgba(255,255,255,.28);
+    border-radius:99px;overflow:hidden;max-width:220px;
+  }
+  .progress-fill{height:100%;background:#fff;border-radius:99px;}
+  .hero-btn{
+    background:#fff;color:var(--green-dark);border:none;
+    padding:12px 22px;border-radius:12px;font-weight:700;
+    font-size:14px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;
+  }
+  .hero-right{
+    width:180px;height:150px;flex-shrink:0;
+    background:rgba(255,255,255,.12);
+    border-radius:16px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:64px;position:relative;z-index:2;
+  }
+  .hero::after{
+    content:"♪ ♫ ♩";
+    position:absolute;right:40px;top:14px;
+    font-size:20px;color:rgba(255,255,255,.35);
+    letter-spacing:10px;
+  }
+
+  /* Section titles */
+  .section-head{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:12px;margin-top:26px;
+  }
+  .section-head h2{font-size:16px;font-weight:800;}
+  .section-head a{font-size:12.5px;color:var(--green-dark);font-weight:600;text-decoration:none;}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+  .path-card{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:16px;padding:16px;
+    display:flex;align-items:center;gap:14px;cursor:pointer;
+  }
+  .path-card:hover{border-color:#cfd8d1;}
+  .path-icon{
+    width:46px;height:46px;border-radius:12px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:22px;
+  }
+  .path-body{flex:1;min-width:0;}
+  .path-body h3{font-size:14.5px;font-weight:700;margin-bottom:2px;}
+  .path-body p{font-size:12px;color:var(--text-mut);margin-bottom:8px;}
+  .path-progress-row{display:flex;align-items:center;gap:8px;}
+  .mini-track{flex:1;height:6px;border-radius:99px;background:#eef0ec;overflow:hidden;}
+  .mini-fill{height:100%;border-radius:99px;}
+  .path-count{font-size:11.5px;font-weight:700;color:var(--text-mut);white-space:nowrap;}
+  .chev{color:var(--text-mut);font-size:16px;}
+  .story-link{font-size:12px;color:var(--purple);font-weight:700;}
+
+  .icon-ear{background:var(--green-light);}
+  .icon-eye{background:var(--blue-light);}
+  .icon-piano{background:var(--orange-light);}
+  .icon-book{background:var(--purple-light);}
+
+  /* Challenges */
+  .challenge-card{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:16px;padding:16px;
+  }
+  .challenge-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .challenge-icon{
+    width:40px;height:40px;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;font-size:18px;
+    background:var(--green-light);
+  }
+  .challenge-title{font-size:14px;font-weight:700;flex:1;}
+  .challenge-progress{display:flex;align-items:center;gap:10px;}
+  .reward{display:flex;gap:8px;font-size:12px;font-weight:700;}
+  .reward span{display:flex;align-items:center;gap:3px;}
+  .xp{color:var(--purple);}
+  .coin{color:var(--orange);}
+
+  /* Activity */
+  .activity-list{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:16px;overflow:hidden;
+  }
+  .activity-item{
+    display:flex;align-items:center;gap:12px;
+    padding:13px 16px;border-bottom:1px solid var(--border);
+    font-size:13.5px;
+  }
+  .activity-item:last-child{border-bottom:none;}
+  .act-icon{font-size:16px;width:20px;text-align:center;}
+  .act-body{flex:1;}
+  .act-body b{font-weight:700;}
+  .act-time{color:var(--text-mut);font-size:12px;width:90px;}
+  .act-xp{color:var(--green-dark);font-weight:700;font-size:12.5px;width:60px;}
+  .act-check{color:var(--green);font-size:15px;}
+
+  /* Sidebar right */
+  .side{width:330px;padding:26px 26px 26px 0;display:flex;flex-direction:column;gap:16px;flex-shrink:0;}
+  .side-card{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:18px;padding:20px;
+  }
+  .side-card h3{font-size:15.5px;font-weight:800;margin-bottom:16px;}
+  .goal-row{display:flex;gap:14px;align-items:center;}
+  .goal-icon{font-size:28px;}
+  .goal-body{flex:1;}
+  .goal-body p{font-size:14.5px;font-weight:700;margin-bottom:8px;}
+  .goal-track{height:9px;background:#eef0ec;border-radius:99px;overflow:hidden;margin-bottom:6px;}
+  .goal-fill{height:100%;background:var(--green);border-radius:99px;}
+  .goal-num{font-size:12.5px;color:var(--text-mut);font-weight:600;}
+
+  .sched-row{display:flex;align-items:center;gap:14px;}
+  .sched-icon{
+    width:46px;height:46px;border-radius:12px;background:var(--blue-light);
+    display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--blue);
+  }
+  .sched-body p{font-size:14.5px;font-weight:700;margin-bottom:2px;}
+  .sched-body span{font-size:13px;color:var(--text-mut);}
+
+  .ach-row{display:flex;justify-content:space-between;align-items:center;font-size:13.5px;padding:10px 0;}
+  .ach-row:not(:last-child){border-bottom:1px solid var(--border);}
+  .ach-label{color:var(--text-mut);display:flex;align-items:center;gap:8px;}
+  .ach-val{font-weight:800;font-size:14px;}
+
+  .lb-row{display:flex;align-items:center;gap:12px;padding:10px 0;font-size:14px;}
+  .lb-rank{
+    width:26px;height:26px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:800;color:#fff;flex-shrink:0;
+  }
+  .lb-rank.g1{background:#f2b705;}
+  .lb-rank.g2{background:#b0b6bb;}
+  .lb-rank.g3{background:#c98a4b;}
+  .lb-rank.me{background:var(--green);}
+  .lb-avatar{
+    width:32px;height:32px;border-radius:50%;background:#e4ece6;
+    display:flex;align-items:center;justify-content:center;font-size:13px;
+    color:var(--green-dark);font-weight:700;flex-shrink:0;
+  }
+  .lb-name{flex:1;font-weight:600;}
+  .lb-xp{font-weight:700;color:var(--text-mut);font-size:13px;}
+  .lb-row.me-row{background:var(--green-light);margin:0 -10px;padding:10px;border-radius:12px;}
+
+  .tree-card{
+    background:linear-gradient(120deg,#dff3e4,#eef8ee);
+    border:none;
+    display:flex;align-items:center;gap:12px;
+  }
+  .tree-icon{font-size:36px;}
+  .tree-body{flex:1;}
+  .tree-body p{font-size:14.5px;font-weight:700;margin-bottom:3px;}
+  .tree-body span{font-size:12.5px;color:var(--text-mut);}
+  .tree-arrow{font-size:20px;color:var(--green-dark);}
+
+  @media(max-width:1050px){
+    .side{display:none;}
+  }
+  @media(max-width:760px){
+    .sidebar{display:none;}
+    .main{padding:16px;}
+    .grid-2{grid-template-columns:1fr;}
+    .hero{flex-direction:column;align-items:flex-start;}
+    .hero-right{width:100%;height:100px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">♪</div>
+      <div>
+        <div class="brand-name">Green Melody</div>
+        <div class="brand-sub">Học nhạc vui mỗi ngày</div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-item active"><span class="ic">🏠</span> Trang chủ</div>
+      <div class="nav-item"><span class="ic">🗺️</span> Hành trình</div>
+      <div class="nav-item"><span class="ic">🌱</span> Trồng cây</div>
+      <div class="nav-item"><span class="ic">🏆</span> Thử thách</div>
+      <div class="nav-item"><span class="ic">👤</span> Hồ sơ</div>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="promo-card">
+        <div class="promo-mascot">🐱</div>
+        <div class="promo-title">Nâng cấp Premium</div>
+        <div class="promo-text">Mở khoá mọi bài học và tính năng đặc biệt!</div>
+        <button class="promo-btn">Nâng cấp ngay</button>
+      </div>
+      <div class="nav-item" style="margin-top:14px;"><span class="ic">⚙️</span> Cài đặt</div>
+      <div class="nav-item"><span class="ic">↪️</span> Đăng xuất</div>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <div class="topbar">
+      <div class="greeting">
+        <h1>Xin chào, Hưng! 👋</h1>
+        <p>Cùng nhau chinh phục âm nhạc nhé!</p>
+      </div>
+      <div class="stat-pills">
+        <div class="pill">🔥 <span><span class="pv">5 ngày</span><span class="pl">Chuỗi học</span></span></div>
+        <div class="pill">❤️ <span><span class="pv">3/3</span><span class="pl">Mạng</span></span></div>
+        <div class="pill">💎 <span><span class="pv">30</span><span class="pl">Gem</span></span></div>
+        <div class="pill">🪙 <span><span class="pv">450</span><span class="pl">Xu</span></span></div>
+        <div class="avatar-round">H</div>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-left">
+        <div class="hero-eyebrow">Bài học tiếp theo của bạn</div>
+        <div class="hero-title">Nhận biết quãng 5 đúng</div>
+        <div class="hero-sub">Bài 8/15 · Quãng</div>
+        <div class="progress-row">
+          <div class="progress-track"><div class="progress-fill" style="width:53%"></div></div>
+          <span style="font-size:13px;font-weight:700;">53%</span>
+        </div>
+        <button class="hero-btn">▶ Tiếp tục học</button>
+      </div>
+      <div class="hero-right">🎹</div>
+    </div>
+
+    <!-- JOURNEY -->
+    <div class="section-head">
+      <h2>Hành trình của bạn</h2>
+      <a href="#">Xem tất cả</a>
+    </div>
+    <div class="grid-2">
+      <div class="path-card">
+        <div class="path-icon icon-ear">👂</div>
+        <div class="path-body">
+          <h3>Cảm âm</h3>
+          <p>Nghe và nhận biết cao độ và giai điệu</p>
+          <div class="path-progress-row">
+            <div class="mini-track"><div class="mini-fill" style="width:54%;background:var(--green);"></div></div>
+            <span class="path-count">36/67</span>
+          </div>
+        </div>
+        <span class="chev">›</span>
+      </div>
+      <div class="path-card">
+        <div class="path-icon icon-eye">👁️</div>
+        <div class="path-body">
+          <h3>Đọc nhạc</h3>
+          <p>Đọc nốt, tiết tấu và bản nhạc</p>
+          <div class="path-progress-row">
+            <div class="mini-track"><div class="mini-fill" style="width:27%;background:var(--blue);"></div></div>
+            <span class="path-count">12/45</span>
+          </div>
+        </div>
+        <span class="chev">›</span>
+      </div>
+      <div class="path-card">
+        <div class="path-icon icon-piano">🎹</div>
+        <div class="path-body">
+          <h3>Thực hành</h3>
+          <p>Luyện tập và chơi nhạc trên màn hình</p>
+          <div class="path-progress-row">
+            <div class="mini-track"><div class="mini-fill" style="width:20%;background:var(--orange);"></div></div>
+            <span class="path-count">8/40</span>
+          </div>
+        </div>
+        <span class="chev">›</span>
+      </div>
+      <div class="path-card">
+        <div class="path-icon icon-book">📖</div>
+        <div class="path-body">
+          <h3>Cốt truyện</h3>
+          <p>Học nhạc qua những câu chuyện thú vị</p>
+          <div class="story-link">Chương 2</div>
+        </div>
+        <span class="chev">›</span>
+      </div>
+    </div>
+
+    <!-- CHALLENGES -->
+    <div class="section-head">
+      <h2>Thử thách hôm nay</h2>
+      <a href="#">Xem tất cả</a>
+    </div>
+    <div class="grid-2">
+      <div class="challenge-card">
+        <div class="challenge-top">
+          <div class="challenge-icon">🎯</div>
+          <div class="challenge-title">Hoàn thành 3 bài học</div>
+        </div>
+        <div class="challenge-progress">
+          <div class="mini-track"><div class="mini-fill" style="width:66%;background:var(--green);"></div></div>
+          <span class="path-count">2/3</span>
+          <div class="reward"><span class="xp">✦ 20</span><span class="coin">🪙 30</span></div>
+        </div>
+      </div>
+      <div class="challenge-card">
+        <div class="challenge-top">
+          <div class="challenge-icon">🎤</div>
+          <div class="challenge-title">Đọc đúng 10 nốt ở khoá Sol</div>
+        </div>
+        <div class="challenge-progress">
+          <div class="mini-track"><div class="mini-fill" style="width:60%;background:var(--green);"></div></div>
+          <span class="path-count">6/10</span>
+          <div class="reward"><span class="xp">✦ 20</span><span class="coin">🪙 30</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY -->
+    <div class="section-head"><h2>Hoạt động gần đây</h2></div>
+    <div class="activity-list">
+      <div class="activity-item">
+        <span class="act-icon">⭐</span>
+        <div class="act-body">Hoàn thành bài: <b>Nhận biết quãng 4</b></div>
+        <span class="act-xp">+20 XP</span>
+        <span class="act-time">2 giờ trước</span>
+        <span class="act-check">✔</span>
+      </div>
+      <div class="activity-item">
+        <span class="act-icon">🏆</span>
+        <div class="act-body">Hoàn thành thử thách: <b>3 bài học trong ngày</b></div>
+        <span class="act-xp">+30 XP</span>
+        <span class="act-time">5 giờ trước</span>
+        <span class="act-check">✔</span>
+      </div>
+      <div class="activity-item">
+        <span class="act-icon">🎵</span>
+        <div class="act-body">Luyện tập bài: <b>Twinkle Twinkle Little Star</b></div>
+        <span class="act-xp">+15 XP</span>
+        <span class="act-time">1 ngày trước</span>
+        <span class="act-check">✔</span>
+      </div>
+    </div>
+</main>
+
+<!-- RIGHT SIDE -->
+<aside class="side">
+    <div class="side-card">
+      <h3>Mục tiêu hôm nay</h3>
+      <div class="goal-row">
+        <div class="goal-icon">🎯</div>
+        <div class="goal-body">
+          <p>Hoàn thành 3 bài học</p>
+          <div class="goal-track"><div class="goal-fill" style="width:66%;"></div></div>
+          <span class="goal-num">2/3</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-card">
+      <h3 style="margin-bottom:10px;">Lịch học</h3>
+      <div class="sched-row">
+        <div class="sched-icon">📅</div>
+        <div class="sched-body">
+          <p>Hôm nay: 15 phút</p>
+          <span>Đã học: 8 phút</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-card">
+      <h3>Thành tích</h3>
+      <div class="ach-row">
+        <span class="ach-label">⭐ Chuỗi học dài nhất</span>
+        <span class="ach-val">12 ngày</span>
+      </div>
+      <div class="ach-row">
+        <span class="ach-label">🕐 Tổng thời gian học</span>
+        <span class="ach-val">4 giờ 32 phút</span>
+      </div>
+      <div class="ach-row">
+        <span class="ach-label">📗 Bài học đã hoàn thành</span>
+        <span class="ach-val">28 bài</span>
+      </div>
+    </div>
+
+    <div class="side-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h3 style="margin:0;">Bảng xếp hạng</h3>
+        <a href="#" style="font-size:12px;color:var(--green-dark);font-weight:600;text-decoration:none;">Xem tất cả</a>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank g1">1</div>
+        <div class="lb-avatar">M</div>
+        <div class="lb-name">Minh Quân</div>
+        <div class="lb-xp">1250 XP</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank g2">2</div>
+        <div class="lb-avatar">K</div>
+        <div class="lb-name">Khánh Linh</div>
+        <div class="lb-xp">980 XP</div>
+      </div>
+      <div class="lb-row">
+        <div class="lb-rank g3">3</div>
+        <div class="lb-avatar">T</div>
+        <div class="lb-name">Tuấn Anh</div>
+        <div class="lb-xp">870 XP</div>
+      </div>
+      <div class="lb-row me-row">
+        <div class="lb-rank me">4</div>
+        <div class="lb-avatar">H</div>
+        <div class="lb-name">Hưng (Bạn)</div>
+        <div class="lb-xp">250 XP</div>
+      </div>
+    </div>
+
+    <div class="side-card tree-card">
+      <div class="tree-icon">🌳</div>
+      <div class="tree-body">
+        <p>Trồng cây nhận xu</p>
+        <span>Học mỗi ngày để cây lớn và nhận phần thưởng!</span>
+      </div>
+      <div class="tree-arrow">›</div>
+    </div>
+</aside>
+
+</body>
+</html>

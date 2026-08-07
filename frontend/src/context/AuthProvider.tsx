@@ -7,20 +7,22 @@ import { useState,useEffect } from "react";
 function AuthProvider({ children }: { children: ReactNode }){
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    useEffect(() => {
-        async function checkLogin() {
-            const res = await fetch("http://localhost:3000/home", {
-                credentials: "include",
-            });
+    const checkLogin = async () => {
+        const res = await fetch("http://localhost:3000/home", {
+            credentials: "include",
+        });
 
-            if (res.ok) {
-                const data = await res.json();
-                setUser(data.user);
-            }
-
-            setLoading(false);
+        if (res.ok) {
+            const data = await res.json();
+            setUser(data);
+        } else {
+            setUser(null);
         }
 
+        setLoading(false);
+    };
+
+    useEffect(() => {
         checkLogin();
     }, []);
 
@@ -32,6 +34,7 @@ function AuthProvider({ children }: { children: ReactNode }){
                 user,
                 setUser,
                 loading,
+                checkLogin,
             }}
         >
             {children}

@@ -49,11 +49,13 @@ const UserSchema = new mongoose.Schema({
     },
     coin: {
         type: Number,
+        min: 0,
         default: 0
     },
     gem: {
         type: Number,
-        default: 0
+        default: 0,
+        min: 0,
     },
     currentStreak: {
         type: Number,

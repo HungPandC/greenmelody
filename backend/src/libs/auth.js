@@ -4,13 +4,13 @@ export function generateTokens(userId) {
     const accessToken = jwt.sign(
         { userId },
         process.env.JWT_SECRET_ACCESS,
-        { expiresIn: "15m" }
+        { expiresIn: "30s" }
     );
 
     const refreshToken = jwt.sign(
         { userId },
         process.env.JWT_SECRET_REFRESH,
-        { expiresIn: "30d" }
+        { expiresIn: "2m" }
     );
 
     return {

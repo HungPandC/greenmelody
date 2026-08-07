@@ -1,8 +1,15 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState,useContext } from "react";
+import AuthContext from "../context/AuthContext";
 import { login,googleLoginService } from "../services/authService";
 import GoogleLoginButton from "../components/ GoogleLoginButton";
 function Login(){
+    const auth = useContext(AuthContext);
+
+    if (!auth) throw new Error("...");
+
+    const {checkLogin} = auth;
+
     const navigate = useNavigate();
     const emailRegex =
     /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/;
@@ -51,16 +58,21 @@ function Login(){
     }
     async function signIn(e: React.FormEvent) {
         e.preventDefault();
+
         const res = await login(email, password);
         const data = await res.json();
+
         if (data.success) {
+            await checkLogin();
             navigate("/home");
         }
     }
-    async function handleGoogleLogin(Idtoken : string){
-        const res = await googleLoginService(Idtoken)
+    async function handleGoogleLogin(Idtoken: string) {
+        const res = await googleLoginService(Idtoken);
         const data = await res.json();
+
         if (data.success) {
+            await checkLogin();
             navigate("/home");
         }
     }

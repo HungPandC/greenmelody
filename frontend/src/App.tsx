@@ -4,7 +4,7 @@ import AuthPage from "./pages/AuthPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import VerifyOTP from "./pages/VerifyRegisterOTP";
-import Home from "./pages/Home";
+import Home from "./pages/Home/Home.tsx";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import GuestRoute from "./routes/GuestRoute";
 import useAuth from "./hooks/useAuth";

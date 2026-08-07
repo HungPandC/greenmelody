@@ -184,7 +184,7 @@ export const verifyRegisterOTP = async (req, res) => {
         },
         process.env.JWT_SECRET_ACCESS,
         {
-            expiresIn: "15m",
+            expiresIn: "30s",
         }
     );
     const refreshToken = jwt.sign(
@@ -193,7 +193,7 @@ export const verifyRegisterOTP = async (req, res) => {
         },
         process.env.JWT_SECRET_REFRESH,
         {
-            expiresIn: "30d",
+            expiresIn: "2m",
         }
     );
     res.cookie("refreshToken", refreshToken, {
