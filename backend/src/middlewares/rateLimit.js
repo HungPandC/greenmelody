@@ -24,12 +24,27 @@ export const registerLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-export const otpLimiter = rateLimit({
+// Giới hạn gửi OTP
+export const sendOtpLimiter = rateLimit({
     windowMs: 60 * 1000, // 1 phút
     limit: 2,
 
     message: {
-        message: "Vui lòng đợi 1 phút trước khi gửi lại OTP."
+        message: "Bạn đã yêu cầu OTP quá nhiều lần. Vui lòng thử lại sau."
+    },
+
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+
+// Giới hạn nhập OTP
+export const verifyOtpLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 phút
+    limit: 5,
+
+    message: {
+        message: "Bạn đã nhập OTP quá nhiều lần. Vui lòng thử lại sau."
     },
 
     standardHeaders: true,
@@ -42,6 +57,21 @@ export const changePasswordLimiter = rateLimit({
 
     message: {
         message: "Bạn đã đổi mật khẩu quá nhiều lần. Vui lòng thử lại sau."
+    },
+
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+export const loginEmailLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    limit: 5,
+
+    keyGenerator: (req) => {
+        return req.body.email?.toLowerCase().trim() || "unknown";
+    },
+
+    message: {
+        message: "Email này đã thử đăng nhập quá nhiều lần. Vui lòng thử lại sau."
     },
 
     standardHeaders: true,

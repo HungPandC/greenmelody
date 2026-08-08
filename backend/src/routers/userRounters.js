@@ -12,9 +12,15 @@ import {
 import {
     registerLimiter,
     loginLimiter,
-    otpLimiter,
-    changePasswordLimiter
+    sendOtpLimiter,
+    verifyOtpLimiter,
+    changePasswordLimiter,
+    loginEmailLimiter,
 } from "../middlewares/rateLimit.js";
+import {
+    generateCsrfToken,
+    doubleCsrfProtection
+} from "../middlewares/csrf.js";
 
 import * as authController from "../controllers/authControllers.js";
 import * as userController from "../controllers/userControllers.js"
@@ -26,35 +32,46 @@ const router = Router();
 
 router.post(
     "/register",
+    doubleCsrfProtection,
     registerLimiter,
     registerValidation,
     checkValidation,
     authController.register
 );
+
 router.post(
     "/sendOtp",
-    otpLimiter,
+    doubleCsrfProtection,
+    sendOtpLimiter,
     checkValidation,
     authController.sendRegisterOtp
 );
+
 router.post(
     "/verifyOtp",
-    otpLimiter,
+    doubleCsrfProtection,
+    verifyOtpLimiter,
     verifyOtpValidation,
     checkValidation,
     authController.verifyRegisterOTP
 );
+
 router.post(
     "/login",
+    doubleCsrfProtection,
     loginLimiter,
+    loginEmailLimiter,
     loginValidation,
     checkValidation,
     authController.login
 );
+
 router.post(
     "/logout",
+    doubleCsrfProtection,
     logout
 );
+
 router.get(
     "/home",
     authenticate,
@@ -63,6 +80,7 @@ router.get(
         res.json(user);
     }
 );
+
 router.get(
     "/profile",
     authenticate,
@@ -72,33 +90,54 @@ router.get(
         });
     }
 );
+
 router.put(
     "/profile/change-password",
+    doubleCsrfProtection,
     authenticate,
     changePasswordLimiter,
     checkValidation,
     userController.ChangePassword
 );
+
 router.post(
     "/forgot-password",
+    doubleCsrfProtection,
     forgotPasswordValidation,
     userController.forgotPasswordController
-)
+);
+
 router.post(
     "/send-reset-otp",
-    userController.sendResetOtpController,
-)
+    doubleCsrfProtection,
+    userController.sendResetOtpController
+);
+
 router.post(
     "/verify-reset-otp",
+    doubleCsrfProtection,
     verifyOtpValidation,
     userController.verifyResetOtpController
-)
+);
+
 router.post(
     "/reset-password",
+    doubleCsrfProtection,
     userController.resetPasswordController
-)
+);
+
 router.post(
     "/google",
-    loginGoogleController,
-)
+    doubleCsrfProtection,
+    loginGoogleController
+);
+
+router.get("/csrf-token", (req, res) => {
+    const csrfToken = generateCsrfToken(req, res);
+
+    res.json({
+        csrfToken
+    });
+});
+
 export default router;

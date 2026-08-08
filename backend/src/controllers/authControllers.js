@@ -1,3 +1,4 @@
+import { randomInt } from "node:crypto";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import transporter from "../libs/mail.js";
@@ -76,9 +77,11 @@ export const login = async (req, res) => {
         return res.status(400).json({message:"ko the thieu passsword,email"})
     }
     const user = await User.findOne({ email });
+
     if (!user) {
-        return res.status(404).json({
-            message: "Không tìm thấy tài khoản"
+        return res.status(401).json({
+            success: false,
+            message: "Email hoặc mật khẩu không chính xác"
         });
     }
 
@@ -88,8 +91,9 @@ export const login = async (req, res) => {
     );
 
     if (!isMatch) {
-        return res.status(400).json({
-            message:"Sai mật khẩu"
+        return res.status(401).json({
+            success: false,
+            message: "Email hoặc mật khẩu không chính xác"
         });
     }
     const { accessToken, refreshToken } = generateTokens(user._id);
@@ -116,7 +120,8 @@ export const sendRegisterOtp = async (req, res) => {
             message: "Phiên đăng ký đã hết hạn"
         });
     }
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const otp = randomInt(100000, 1000000).toString();
 
     user.hashedRegisterOTP = await bcrypt.hash(otp, 10);
     user.emailOTPExpires = new Date(
@@ -157,6 +162,11 @@ export const verifyRegisterOTP = async (req, res) => {
             message: "OTP đã hết hạn."
         }); 
     }   
+    if (!data.hashedRegisterOTP || !data.emailOTPExpires) {
+        return res.status(400).json({
+            message: "OTP chưa được gửi."
+        });
+    }
     const ok = await bcrypt.compare(
         otp,
         data.hashedRegisterOTP

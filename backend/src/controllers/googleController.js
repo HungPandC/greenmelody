@@ -4,7 +4,8 @@ import { generateTokens,setAuthCookies } from "../libs/auth.js";
 
 
 
-const client = new OAuth2Client("93291837825-aq7j7ag5nnvef7mh5t9876r879m9s73a.apps.googleusercontent.com");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 export const loginGoogleController = async (req , res) => {
     try{
         const { idToken } = req.body;

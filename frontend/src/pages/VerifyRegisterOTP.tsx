@@ -1,6 +1,7 @@
 import { useState,useRef, useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { verifyRegisterOtp,sendRegisterOtp } from "../services/authService";
+import useAuth from "../hooks/useAuth";
 function VerifyOTP(){
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
     const linkRef = useRef<HTMLAnchorElement>(null);
@@ -8,14 +9,14 @@ function VerifyOTP(){
     const [success, setSuccess] = useState(false);
     const demNguocId = useRef<number | null>(null);
     const [second, setSecond] = useState(60);
-
+    const { csrfToken } = useAuth()
     const navigate = useNavigate();
 
     const [array, Setarray] = useState<string[]>(["", "", "", "", "", ""]);
 
     
     async function sendOtp() {
-        const res = await sendRegisterOtp()
+        const res = await sendRegisterOtp(csrfToken)
         const data = await res.json();
         if (!data.success) {
             alert(data.message);
@@ -23,7 +24,7 @@ function VerifyOTP(){
     }
     async function VerifyOtp() {
         const otp = array.join("");
-        const res = await verifyRegisterOtp(otp)
+        const res = await verifyRegisterOtp(otp,csrfToken)
         const data = await res.json();
         console.log(data);
         if(data.success){

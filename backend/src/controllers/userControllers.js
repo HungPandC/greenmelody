@@ -1,3 +1,4 @@
+import { randomInt } from "node:crypto";
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import transporter from "../libs/mail.js";
@@ -85,10 +86,11 @@ export const forgotPasswordController = async (req, res) => {
 
         const user = await User.findOne({ email });
 
+        // Không tiết lộ email có tồn tại hay không
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "Không tìm thấy tài khoản."
+            return res.status(200).json({
+                success: true,
+                message: "Nếu email tồn tại, hướng dẫn đặt lại mật khẩu sẽ được gửi đến email của bạn."
             });
         }
 
@@ -116,7 +118,7 @@ export const forgotPasswordController = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Tạo phiên đặt lại mật khẩu thành công."
+            message: "Nếu email tồn tại, hướng dẫn đặt lại mật khẩu sẽ được gửi đến email của bạn."
         });
 
     } catch (error) {
@@ -128,6 +130,8 @@ export const forgotPasswordController = async (req, res) => {
         });
     }
 };
+
+
 export const sendResetOtpController = async (req, res) => {
     try {
         const sessionId = req.cookies.otp_session_forgot;
@@ -164,9 +168,7 @@ export const sendResetOtpController = async (req, res) => {
             });
         }
 
-        const otp = Math.floor(
-            100000 + Math.random() * 900000
-        ).toString();
+        const otp = randomInt(100000, 1000000).toString();  
 
         const hashedResetOtp = await bcrypt.hash(otp, 10);
 

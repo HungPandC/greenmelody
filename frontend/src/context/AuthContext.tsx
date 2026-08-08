@@ -8,7 +8,9 @@ type TypeContext = {
     setUser: Dispatch<SetStateAction<User | null>>;
     loading: boolean;
     checkLogin: () => Promise<void>;
-}
+    csrfToken: string;
+};
+
 const AuthContext = createContext<TypeContext | null>(null);
 
 export default AuthContext

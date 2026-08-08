@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import profanity from "allprofanity";
 import { register } from "../services/authService";
+import useAuth from "../hooks/useAuth";
 function Register() {
     const emailRegex =
   /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/;
-  
+    const { csrfToken } = useAuth()
     const [username, setUsername] = useState("");
     const [email, setUsermail] = useState("");
     const [password, setUserpassword] = useState("");
@@ -29,7 +30,7 @@ function Register() {
 
     async function CreateAccount(e: React.FormEvent) {
         e.preventDefault();
-        const res = await register({username,email,password,password_again})
+        const res = await register({username,email,password,password_again},csrfToken)
 
         const data = await res.json();
         console.log(data);

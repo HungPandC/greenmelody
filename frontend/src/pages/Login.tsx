@@ -1,14 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { useState,useContext } from "react";
-import AuthContext from "../context/AuthContext";
+import { useState } from "react";
 import { login,googleLoginService } from "../services/authService";
 import GoogleLoginButton from "../components/ GoogleLoginButton";
+import useAuth from "../hooks/useAuth";
+
 function Login(){
-    const auth = useContext(AuthContext);
 
-    if (!auth) throw new Error("...");
-
-    const {checkLogin} = auth;
+    const { checkLogin, csrfToken } = useAuth()
 
     const navigate = useNavigate();
     const emailRegex =
@@ -58,8 +56,7 @@ function Login(){
     }
     async function signIn(e: React.FormEvent) {
         e.preventDefault();
-
-        const res = await login(email, password);
+        const res = await login(email, password,csrfToken);
         const data = await res.json();
 
         if (data.success) {
@@ -68,7 +65,7 @@ function Login(){
         }
     }
     async function handleGoogleLogin(Idtoken: string) {
-        const res = await googleLoginService(Idtoken);
+        const res = await googleLoginService(Idtoken,csrfToken);
         const data = await res.json();
 
         if (data.success) {
