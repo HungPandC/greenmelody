@@ -28,6 +28,10 @@ const passwordSchema = new mongoose.Schema({
         type: Date,
         required: true,
     },
+    revoked: {
+        type: Boolean,
+        default: false
+    }
 });
 
 export default mongoose.model("PasswordSession", passwordSchema);

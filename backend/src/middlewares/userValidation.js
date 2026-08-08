@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { body, validationResult } from "express-validator";
 import profanity from "allprofanity";
 import { verify } from 'node:crypto';
+import { createAccessToken,createRefreshToken,setAccessTokenCookie,setRefreshTokenCookie } from "../libs/auth";
 
 const bannedWords = [
     "admin",
@@ -162,57 +163,50 @@ export const resetPasswordValidation = [
     passwordAgainValidator(),
 ]
 
+
 export function authenticate(req, res, next) {
-    const token = req.cookies.accessToken;
+    const token = req.cookies.accessToken;  
     if (!token) {
         return res.status(401).json({
             message: "Chưa đăng nhập"
         });
-    }
-
+    }   
     try {
         const decoded = jwt.verify(
             token,
             process.env.JWT_SECRET_ACCESS
-        );
-
+        );  
         req.user = decoded;
-        next();
-    } catch(error) {
-        if(error.name === "TokenExpiredError"){
+        next(); 
+    } catch (error) {   
+        if (error.name === "TokenExpiredError") {   
             try {
-                const refresh = req.cookies.refreshToken;
+                const refresh = req.cookies.refreshToken;   
                 if (!refresh) {
                     return res.status(401).json({
-                        message: "access het han"
+                        message: "Access token hết hạn"
                     });
-                }
+                }   
                 const decodedRefresh = jwt.verify(
                     refresh,
                     process.env.JWT_SECRET_REFRESH
-                );// cai nay co thong giong id
-                const accessToken = jwt.sign(
-                    { userId: decodedRefresh.userId },
-                    process.env.JWT_SECRET_ACCESS,
-                    { expiresIn: "30s" }
-                );
-                res.cookie("accessToken", accessToken, {
-                    httpOnly: true,
-                    secure: false,
-                    sameSite: "lax",
-                    maxAge: 15 * 60 * 1000,
-                });
-                req.user = decodedRefresh;
-
-                next();
+                );  
+                const accessToken = createAccessToken(
+                    decodedRefresh.userId
+                );  
+                setAccessTokenCookie(
+                    res,
+                    accessToken
+                );  
+                req.user = decodedRefresh;  
+                next(); 
             } catch (err) {
                 return res.status(401).json({
-                    message: "refresh không hợp lệ"
+                    message: "Refresh token không hợp lệ"
                 });
             }
-        }
-
-        else if(error.name === "JsonWebTokenError"){
+        }   
+        else if (error.name === "JsonWebTokenError") {
             return res.status(401).json({
                 message: "Token không hợp lệ"
             });

@@ -8,7 +8,7 @@ import PasswordReset from "../models/PasswordSession.js";
 import PasswordSession from "../models/PasswordSession.js";
 
 
-export const ChangePassword = async (req, res) => {
+export const changePasswordController = async (req, res) => {
     try {
         const { oldPass, newPass, confirmPass } = req.body;
 
@@ -60,7 +60,10 @@ export const ChangePassword = async (req, res) => {
 
         // Lưu
         await user.save();
-
+        await PasswordSession.updateMany(
+            { userId: user._id, revoked: false },
+            { $set: { revoked: true } }
+        );
         return res.status(200).json({
             message: "Đổi mật khẩu thành công",
         });

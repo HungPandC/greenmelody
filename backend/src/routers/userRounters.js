@@ -97,7 +97,7 @@ router.put(
     authenticate,
     changePasswordLimiter,
     checkValidation,
-    userController.ChangePassword
+    userController.changePasswordController
 );
 
 router.post(
