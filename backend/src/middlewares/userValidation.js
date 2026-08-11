@@ -1,9 +1,11 @@
-// REGISTER
 import jwt from "jsonwebtoken";
 import { body, validationResult } from "express-validator";
 import profanity from "allprofanity";
 import { verify } from 'node:crypto';
-import { createAccessToken,createRefreshToken,setAccessTokenCookie,setRefreshTokenCookie } from "../libs/auth";
+import { createAccessToken,createRefreshToken,setAccessTokenCookie,setRefreshTokenCookie,setAuthCookies, } from "../libs/auth.js";
+import bcrypt from "bcrypt";
+import PasswordSession from "../models/PasswordSession.js";
+import { randomUUID } from "node:crypto";
 
 const bannedWords = [
     "admin",
@@ -142,7 +144,7 @@ export const registerValidation = [
     usernameValidator(),
     emailValidator(),
     passwordValidator(),
-    passwordAgainValidator(),
+    passwordAgainValidator("password_again"),
 ];
 
 // LOGIN
@@ -162,57 +164,15 @@ export const resetPasswordValidation = [
     loginPasswordValidator(),
     passwordAgainValidator(),
 ]
+export const logout = (req, res) => {
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
 
+    res.json({
+        success: true,
+    });
+};
 
-export function authenticate(req, res, next) {
-    const token = req.cookies.accessToken;  
-    if (!token) {
-        return res.status(401).json({
-            message: "Chưa đăng nhập"
-        });
-    }   
-    try {
-        const decoded = jwt.verify(
-            token,
-            process.env.JWT_SECRET_ACCESS
-        );  
-        req.user = decoded;
-        next(); 
-    } catch (error) {   
-        if (error.name === "TokenExpiredError") {   
-            try {
-                const refresh = req.cookies.refreshToken;   
-                if (!refresh) {
-                    return res.status(401).json({
-                        message: "Access token hết hạn"
-                    });
-                }   
-                const decodedRefresh = jwt.verify(
-                    refresh,
-                    process.env.JWT_SECRET_REFRESH
-                );  
-                const accessToken = createAccessToken(
-                    decodedRefresh.userId
-                );  
-                setAccessTokenCookie(
-                    res,
-                    accessToken
-                );  
-                req.user = decodedRefresh;  
-                next(); 
-            } catch (err) {
-                return res.status(401).json({
-                    message: "Refresh token không hợp lệ"
-                });
-            }
-        }   
-        else if (error.name === "JsonWebTokenError") {
-            return res.status(401).json({
-                message: "Token không hợp lệ"
-            });
-        }
-    }
-}
 export function checkValidation(
     req,
     res,
@@ -228,11 +188,178 @@ export function checkValidation(
 
     next();
 }
-export const logout = (req, res) => {
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
 
-    res.json({
-        success: true,
-    });
-};
+export async function authenticate(req, res, next) {
+    const token = req.cookies.accessToken;
+
+    if (!token) {
+        return res.status(401).json({
+            message: "Chưa đăng nhập"
+        });
+    }
+
+    try {
+        // =========================
+        // 1. Access token còn hạn
+        // =========================
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET_ACCESS
+        );
+
+        req.user = decoded;
+        console.log("access con han")
+        return next();
+    } catch (error) {
+
+        // =========================
+        // 2. Access token hết hạn
+        // =========================
+        if (error.name === "TokenExpiredError") {
+
+            try {
+                const refresh = req.cookies.refreshToken;
+
+                if (!refresh) {
+                    return res.status(401).json({
+                        message: "Access token hết hạn"
+                    });
+                }
+
+                // Verify refresh token
+                const decodedRefresh = jwt.verify(
+                    refresh,
+                    process.env.JWT_SECRET_REFRESH
+                );
+
+                // =========================
+                // 3. Tìm session tương ứng
+                // =========================
+                const session = await PasswordSession.findOne({
+                    sessionId: decodedRefresh.sessionId,
+                    userId: decodedRefresh.userId,
+                    revoked: false
+                });
+
+                if (!session) {
+                    return res.status(401).json({
+                        message: "Session không hợp lệ hoặc đã bị thu hồi"
+                    });
+                }
+
+                // =========================
+                // 4. Rotation refresh token
+                // =========================
+                const now = new Date();
+
+                // const IDLE_TIMEOUT = 30 * 24 * 60 * 60 * 1000;
+                const IDLE_TIMEOUT =  30 * 1000;
+
+                if (
+                    now.getTime() - session.lastActivityAt.getTime()
+                    >= IDLE_TIMEOUT
+                ) {
+                    session.revoked = true;
+                    await session.save();
+
+                    return res.status(401).json({
+                        message: "Phiên đăng nhập đã hết hạn do không hoạt động"
+                    });
+                }
+
+                if (now >= session.absoluteExpiresAt) {
+                    session.revoked = true;
+                    await session.save();
+
+                    return res.status(401).json({
+                        message: "Phiên đăng nhập đã hết hạn"
+                    });
+                }
+                // Kiểm tra refresh token hiện tại có đúng session không
+                const isValidRefreshToken = await bcrypt.compare(
+                    refresh,
+                    session.refreshTokenHash
+                );
+
+                if (!isValidRefreshToken) {
+                    session.revoked = true;
+                    await session.save();
+
+                    return res.status(401).json({
+                        message: "Refresh token không hợp lệ"
+                    });
+                }
+                // Revoke session cũ
+                session.revoked = true;
+                await session.save();
+
+                // Tạo sessionId mới
+                const newSessionId = randomUUID();
+
+                // Tạo token mới
+                const newAccessToken = createAccessToken(
+                    decodedRefresh.userId
+                );
+
+                const newRefreshToken = createRefreshToken(
+                    decodedRefresh.userId,
+                    newSessionId
+                );
+
+                // Hash refresh token mới
+                const newRefreshTokenHash = await bcrypt.hash(
+                    newRefreshToken,
+                    10
+                );
+
+                // Tạo PasswordSession mới
+                await PasswordSession.create({
+                    sessionId: newSessionId,
+                    userId: decodedRefresh.userId,
+                    refreshTokenHash: newRefreshTokenHash,
+
+                    lastActivityAt: now,
+                    absoluteExpiresAt: session.absoluteExpiresAt,
+
+                    revoked: false
+                });
+
+                // Ghi cookie mới
+                setAuthCookies(
+                    res,
+                    newAccessToken,
+                    newRefreshToken
+                );
+
+                // Cho request tiếp tục
+                req.user = {
+                    userId: decodedRefresh.userId
+                };
+
+                console.log("Đã rotation refresh token");
+
+                return next();
+            } catch (err) {
+                console.error(err);
+
+                return res.status(401).json({
+                    message: "Refresh token không hợp lệ"
+                });
+            }
+        }
+
+        // =========================
+        // 3. Access token sai
+        // =========================
+        if (error.name === "JsonWebTokenError") {
+            return res.status(401).json({
+                message: "Token không hợp lệ"
+            });
+        }
+
+        return res.status(401).json({
+            message: "Xác thực thất bại"
+        });
+    }
+}
+

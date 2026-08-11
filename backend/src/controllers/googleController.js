@@ -1,8 +1,9 @@
 import { OAuth2Client } from "google-auth-library";
 import User from "../models/User.js";
 import { generateTokens,setAuthCookies } from "../libs/auth.js";
-
-
+import PasswordSession from "../models/PasswordSession.js";
+import { randomUUID } from "node:crypto";
+import bcrypt from "bcrypt";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -33,28 +34,52 @@ export const loginGoogleController = async (req , res) => {
         const name = payload.name;
         const googleId = payload.sub;
         
-        const user = await User.findOne({ email });
+        let user = await User.findOne({ email });
 
         if (!user) {
-            const newUser = await User.create({
+            user = await User.create({
                 username: name ?? email.split("@")[0],
                 email,
                 googleId,
+                isVerified: true
             });
-
-            const { accessToken, refreshToken } =
-                await generateTokens(newUser._id.toString());
-            setAuthCookies(res, accessToken, refreshToken);
         } else {
             if (!user.googleId) {
                 user.googleId = googleId;
                 await user.save();
             }
-            
-            const { accessToken, refreshToken } =
-                await generateTokens(user._id.toString());
-            setAuthCookies(res, accessToken, refreshToken);
         }
+
+        const sessionId = randomUUID();
+
+        const { accessToken, refreshToken } =
+            generateTokens(
+                user._id.toString(),
+                sessionId
+            );
+        const refreshTokenHash = await bcrypt.hash(
+            refreshToken,
+            10
+        );
+        await PasswordSession.create({
+            sessionId: sessionId,
+            userId: user._id,
+            revoked: false,
+            lastActivityAt: new Date(
+                Date.now()
+            ),
+            absoluteExpiresAt: new Date(
+                // Date.now() + 180 * 24 * 60 * 60 * 1000
+                Date.now() + 60 * 1000
+            ),
+            refreshTokenHash,
+        });
+
+        setAuthCookies(
+            res,
+            accessToken,
+            refreshToken
+        );
 
         return res.json({
             success: true,

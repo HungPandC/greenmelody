@@ -4,21 +4,26 @@ export function createAccessToken(userId) {
     return jwt.sign(
         { userId },
         process.env.JWT_SECRET_ACCESS,
-        { expiresIn: "30s" }
+        { expiresIn: "20s" }
     );
 }
 
-export function createRefreshToken(userId) {
+export function createRefreshToken(userId,sessionId) {
     return jwt.sign(
-        { userId },
+        {
+            userId,
+            sessionId
+        },
         process.env.JWT_SECRET_REFRESH,
-        { expiresIn: "2m" }
+        {
+            expiresIn: "2m"
+        }
     );
 }
 
-export function generateTokens(userId) {
+export function generateTokens(userId,sessionId) {
     const accessToken = createAccessToken(userId);
-    const refreshToken = createRefreshToken(userId);
+    const refreshToken = createRefreshToken(userId,sessionId);
 
     return {
         accessToken,

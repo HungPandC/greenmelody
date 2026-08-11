@@ -5,7 +5,7 @@ import transporter from "../libs/mail.js";
 import PendingUser from "../models/PendingUser.js";
 import { randomUUID } from "node:crypto";
 import PasswordReset from "../models/PasswordSession.js";
-import PasswordSession from "../models/PasswordSession.js";
+import PasswordResetSession from "../models/PasswordResetSession.js";
 
 
 export const changePasswordController = async (req, res) => {
@@ -60,7 +60,7 @@ export const changePasswordController = async (req, res) => {
 
         // Lưu
         await user.save();
-        await PasswordSession.updateMany(
+        await PasswordResetSession.updateMany(
             { userId: user._id, revoked: false },
             { $set: { revoked: true } }
         );
@@ -98,13 +98,13 @@ export const forgotPasswordController = async (req, res) => {
         }
 
         // Xóa các session cũ của người dùng
-        await PasswordSession.deleteMany({
+        await PasswordResetSession.deleteMany({
             userId: user._id
         });
 
         const sessionId = randomUUID();
 
-        const newSession = new PasswordSession({
+        const newSession = new PasswordResetSession({
             sessionId,
             userId: user._id,
             expiredAt: new Date(Date.now() + 5 * 60 * 1000)
@@ -146,7 +146,7 @@ export const sendResetOtpController = async (req, res) => {
             });
         }
 
-        const session = await PasswordSession.findOne({ sessionId });
+        const session = await PasswordResetSession.findOne({ sessionId });
 
         if (!session) {
             return res.status(404).json({
@@ -220,7 +220,7 @@ export const verifyResetOtpController = async (req, res) => {
             });
         }
 
-        const session = await PasswordSession.findOne({ sessionId });
+        const session = await PasswordResetSession.findOne({ sessionId });
 
         if (!session) {
             return res.status(404).json({
@@ -298,7 +298,7 @@ export const resetPasswordController = async (req, res) => {
             });
         }
 
-        const session = await PasswordSession.findOne({ sessionId });
+        const session = await PasswordResetSession.findOne({ sessionId });
 
         if (!session) {
             return res.status(404).json({
@@ -346,7 +346,7 @@ export const resetPasswordController = async (req, res) => {
         await user.save();
 
         // Xóa toàn bộ session quên mật khẩu của người dùng
-        await PasswordSession.deleteMany({
+        await PasswordResetSession.deleteMany({
             userId: user._id
         });
 

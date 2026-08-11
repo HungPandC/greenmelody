@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const passwordSchema = new mongoose.Schema({
+const passwordResetSchema = new mongoose.Schema({
     sessionId: {
         type: String,
         required: true,
@@ -13,30 +13,23 @@ const passwordSchema = new mongoose.Schema({
         required: true,
     },
 
-    revoked: {
-        type: Boolean,
-        default: false
-    },
-
-
-    refreshTokenHash: {
+    hashedResetOtp: {
         type: String,
+        default: null,
     },
 
-    lastActivityAt: {
-        type: Date,
-        required: true,
-        // ngay bay gio
+    isVerified: {
+        type: Boolean,
+        default: false,
     },
 
-    absoluteExpiresAt: {
+    expiredAt: {
         type: Date,
         required: true,
-        // 180 ngay sau
     },
 });
 
 export default mongoose.model(
-    "PasswordSession",
-    passwordSchema
+    "PasswordResetSession",
+    passwordResetSchema
 );

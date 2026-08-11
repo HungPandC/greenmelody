@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import styles from "./Home.module.css";
+import { useNavigate} from 'react-router-dom';
 
-const Home = () => {
+function Home(){
+  const navigate = useNavigate();
   useEffect( () => {
 
       fetch("http://localhost:3000/home", {
@@ -81,7 +83,7 @@ const Home = () => {
           <div className={styles.grid2}>
             <div className={styles.pathCard}>
               <div className={`${styles.pathIcon} ${styles.iconEar}`}>👂</div>
-              <div className={styles.pathBody}>
+              <div className={styles.pathBody} onClick={()=>navigate("/ear-training")}>
                 <h3>Cảm âm</h3>
                 <p>Nghe và nhận biết cao độ và giai điệu</p>
                 <div className={styles.pathProgressRow}>

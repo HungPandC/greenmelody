@@ -14,7 +14,10 @@ function AuthPage() {
 
     return (
         <div className="wrapper" style={{ backgroundImage: `url(${bg})` }}>
-            <div className={`auth-wrap ${isLogin ? "login" : "register"}`}>
+            <div
+                key={location.pathname}
+                className={`auth-wrap ${isLogin ? "login" : "register"}`}
+            >
                 <div className="card">
                     <Outlet />
                 </div>

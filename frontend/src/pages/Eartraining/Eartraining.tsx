@@ -1,5 +1,5 @@
-import homeStyles from "./Home.module.css";
-import styles from "./EarTraining.module.css";
+import styles from "./Eartraining.module.css";
+import { useNavigate } from "react-router-dom";
 
 type Skill = {
   icon: string;
@@ -53,55 +53,125 @@ const totalAll = groups.flatMap(g => g.skills).reduce((s, k) => s + k.total, 0);
 const totalPct = Math.round((totalDone / totalAll) * 100);
 
 const EarTraining = () => {
-  return (
-    <div className={homeStyles.layout}>
-      {/* SIDEBAR TRÁI - giữ nguyên như Home, active = Cảm âm */}
-      <aside className={homeStyles.sidebar}>
-        <div className={homeStyles.brand}>
-          <div className={homeStyles.brandIcon}>♪</div>
-          <div>
-            <div className={homeStyles.brandName}>Green Melody</div>
-            <div className={homeStyles.brandSub}>Học nhạc vui mỗi ngày</div>
-          </div>
-        </div>
-        <nav className={homeStyles.nav}>
-          <div className={homeStyles.navItem}><span className={homeStyles.ic}>🏠</span> Trang chủ</div>
-          <div className={homeStyles.navItem}><span className={homeStyles.ic}>🗺️</span> Hành trình</div>
-          <div className={homeStyles.navItem}><span className={homeStyles.ic}>🌱</span> Trồng cây</div>
-          <div className={homeStyles.navItem}><span className={homeStyles.ic}>🏆</span> Thử thách</div>
-          <div className={`${homeStyles.navItem} ${homeStyles.active}`}><span className={homeStyles.ic}>🎧</span> Cảm âm</div>
-          <div className={homeStyles.navItem}><span className={homeStyles.ic}>🎼</span> Đọc nhạc</div>
-          <div className={homeStyles.navItem}><span className={homeStyles.ic}>🎹</span> Thực hành</div>
-          <div className={homeStyles.navItem}><span className={homeStyles.ic}>📖</span> Cốt truyện</div>
-          <div className={homeStyles.navItem}><span className={homeStyles.ic}>👤</span> Hồ sơ</div>
-        </nav>
-        <div className={homeStyles.sidebarBottom}>
-          <div className={homeStyles.promoCard}>
-            <div className={homeStyles.promoMascot}>🐱</div>
-            <div className={homeStyles.promoTitle}>Nâng cấp Premium</div>
-            <div className={homeStyles.promoText}>Mở khoá mọi bài học và tính năng đặc biệt!</div>
-            <button className={homeStyles.promoBtn}>Nâng cấp ngay</button>
-          </div>
-          <div className={homeStyles.navItem} style={{ marginTop: 14 }}><span className={homeStyles.ic}>⚙️</span> Cài đặt</div>
-          <div className={homeStyles.navItem}><span className={homeStyles.ic}>↪️</span> Đăng xuất</div>
-        </div>
-      </aside>
+  const navigate = useNavigate();
 
-      {/* MAIN */}
-      <main className={homeStyles.main}>
-        <div className={homeStyles.topbar}>
-          <div className={homeStyles.greeting}>
-            <h1>Cảm âm</h1>
-            <p>Luyện nghe và nhận biết âm nhạc qua 9 kỹ năng quan trọng</p>
-          </div>
-          <div className={homeStyles.statPills}>
-            <div className={homeStyles.pill}>🔥 <span><span className={homeStyles.pv}>5 ngày</span><span className={homeStyles.pl}>Chuỗi học</span></span></div>
-            <div className={homeStyles.pill}>❤️ <span><span className={homeStyles.pv}>3/3</span><span className={homeStyles.pl}>Mạng</span></span></div>
-            <div className={homeStyles.pill}>💎 <span><span className={homeStyles.pv}>30</span><span className={homeStyles.pl}>Gem</span></span></div>
-            <div className={homeStyles.pill}>🪙 <span><span className={homeStyles.pv}>450</span><span className={homeStyles.pl}>Xu</span></span></div>
-            <div className={homeStyles.avatarRound}>H</div>
-          </div>
+
+  return (
+  <div className="layout">
+    {/* SIDEBAR TRÁI - giữ nguyên như Home, active = Cảm âm */}
+    <aside className="sidebar">
+      <div className="brand">
+        <div className="brandIcon">♪</div>
+        <div>
+          <div className="brandName">Green Melody</div>
+          <div className="brandSub">Học nhạc vui mỗi ngày</div>
         </div>
+      </div>
+
+      <nav className="nav">
+        <div className="navItem">
+          <span className="ic">🏠</span> Trang chủ
+        </div>
+
+        <div className="navItem">
+          <span className="ic">🗺️</span> Hành trình
+        </div>
+
+        <div className="navItem">
+          <span className="ic">🌱</span> Trồng cây
+        </div>
+
+        <div className="navItem">
+          <span className="ic">🏆</span> Thử thách
+        </div>
+
+        <div className="navItem active">
+          <span className="ic">🎧</span> Cảm âm
+        </div>
+
+        <div className="navItem">
+          <span className="ic">🎼</span> Đọc nhạc
+        </div>
+
+        <div className="navItem">
+          <span className="ic">🎹</span> Thực hành
+        </div>
+
+        <div className="navItem">
+          <span className="ic">📖</span> Cốt truyện
+        </div>
+
+        <div className="navItem">
+          <span className="ic">👤</span> Hồ sơ
+        </div>
+      </nav>
+
+      <div className="sidebarBottom">
+        <div className="promoCard">
+          <div className="promoMascot">🐱</div>
+          <div className="promoTitle">Nâng cấp Premium</div>
+          <div className="promoText">
+            Mở khoá mọi bài học và tính năng đặc biệt!
+          </div>
+          <button className="promoBtn">Nâng cấp ngay</button>
+        </div>
+
+        <div className="navItem" style={{ marginTop: 14 }}>
+          <span className="ic">⚙️</span> Cài đặt
+        </div>
+
+        <div className="navItem">
+          <span className="ic">↪️</span> Đăng xuất
+        </div>
+      </div>
+    </aside>
+
+    {/* MAIN */}
+    <main className="main">
+      <div className="topbar">
+        <div className="greeting">
+          <h1>Cảm âm</h1>
+          <p>
+            Luyện nghe và nhận biết âm nhạc qua 9 kỹ năng quan trọng
+          </p>
+        </div>
+
+        <div className="statPills">
+          <div className="pill">
+            🔥
+            <span>
+              <span className="pv">5 ngày</span>
+              <span className="pl">Chuỗi học</span>
+            </span>
+          </div>
+
+          <div className="pill">
+            ❤️
+            <span>
+              <span className="pv">3/3</span>
+              <span className="pl">Mạng</span>
+            </span>
+          </div>
+
+          <div className="pill">
+            💎
+            <span>
+              <span className="pv">30</span>
+              <span className="pl">Gem</span>
+            </span>
+          </div>
+
+          <div className="pill">
+            🪙
+            <span>
+              <span className="pv">450</span>
+              <span className="pl">Xu</span>
+            </span>
+          </div>
+
+          <div className="avatarRound">H</div>
+        </div>
+      </div>
 
         {/* HEADER TRANG + TIẾN ĐỘ TỔNG */}
         <div className={styles.pageHead}>
@@ -135,7 +205,15 @@ const EarTraining = () => {
                 <div
                   className={styles.skillCard}
                   key={skill.title}
-                  style={{ ["--fill" as any]: skill.fill, ["--art-bg" as any]: skill.artBg }}
+                  style={{
+                    ["--fill" as any]: skill.fill,
+                    ["--art-bg" as any]: skill.artBg
+                  }}
+                  onClick={() => {
+                    if (skill.title === "Quãng") {
+                      navigate("/interval");
+                    }
+                  }}
                 >
                   <div className={styles.skillArt}>{skill.icon}</div>
                   <h3>{skill.title}</h3>
@@ -160,8 +238,8 @@ const EarTraining = () => {
       </main>
 
       {/* SIDEBAR PHẢI */}
-      <aside className={homeStyles.side}>
-        <div className={`${homeStyles.sideCard} ${styles.overviewCard}`}>
+      <aside className="side">
+        <div className={`sideCard ${styles.overviewCard}`}>
           <h3>Tổng quan Cảm âm</h3>
           <div className={styles.donutWrap} style={{ ["--pct" as any]: totalPct }}>
             <div className={styles.donutInner}>
@@ -171,7 +249,7 @@ const EarTraining = () => {
           </div>
         </div>
 
-        <div className={homeStyles.sideCard}>
+        <div className="sideCard">
           <h3>Chuỗi học hiện tại</h3>
           <div className={styles.streakBig}>
             <div className={styles.streakEmoji}>🔥</div>
@@ -182,7 +260,7 @@ const EarTraining = () => {
           </div>
         </div>
 
-        <div className={homeStyles.sideCard}>
+        <div className="sideCard">
           <h3>Phần thưởng</h3>
           <div className={styles.rewardRow}>
             <span className={styles.rewardLabel}>⭐ XP tích lũy</span>
@@ -198,7 +276,7 @@ const EarTraining = () => {
           </div>
         </div>
 
-        <div className={homeStyles.sideCard}>
+        <div className="sideCard">
           <h3 style={{ marginBottom: 10 }}>Mục tiêu hôm nay</h3>
           <div className={styles.todayGoalRow}>
             <div className={styles.todayGoalIcon}>🎯</div>

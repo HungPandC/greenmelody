@@ -6,6 +6,7 @@ import PendingUser from "../models/PendingUser.js";
 import { randomUUID } from "node:crypto";
 import jwt from "jsonwebtoken";
 import { generateTokens, setAuthCookies } from "../libs/auth.js";
+import PasswordSession from "../models/PasswordSession.js";
 
 export const register = async (req, res) => {
     try{
@@ -13,7 +14,8 @@ export const register = async (req, res) => {
 
         if(!username || !password || !email || !password_again){
             return res.status(400).json({message:"ko the thieu username, passsword,email"})
-        }
+        };
+        console.log(password_again,password);
         if (password !== password_again) {
             return res.status(400).json({
                 message: "Mật khẩu xác nhận không khớp"
@@ -40,7 +42,7 @@ export const register = async (req, res) => {
             });
         }
         const sessionId = randomUUID();
-        // Hash mật khẩu
+        
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Tạo tài khoản
@@ -96,9 +98,34 @@ export const login = async (req, res) => {
             message: "Email hoặc mật khẩu không chính xác"
         });
     }
-    const { accessToken, refreshToken } = generateTokens(user._id);
 
-    setAuthCookies(res, accessToken, refreshToken);
+    const sessionId = randomUUID();
+
+
+    const { accessToken, refreshToken } =
+        generateTokens(user._id, sessionId);
+    const refreshTokenHash = await bcrypt.hash(
+        refreshToken,
+        10
+    );
+    await PasswordSession.create({
+        sessionId: sessionId,
+        userId: user._id,
+        revoked: false,
+        lastActivityAt: new Date(
+            Date.now()
+        ),
+        absoluteExpiresAt: new Date(
+            // Date.now() + 180 * 24 * 60 * 60 * 1000
+            Date.now() + 60 * 1000
+        ),
+        refreshTokenHash,
+    });
+    setAuthCookies(
+        res,
+        accessToken,
+        refreshToken
+    );
     res.json({
         success: true
     });
@@ -141,84 +168,112 @@ export const sendRegisterOtp = async (req, res) => {
         success: true
     });
 };
-export const verifyRegisterOTP = async (req, res) => {  
-    const { otp } = req.body;
-    const sessionId = req.cookies.otp_session;
-    if (!sessionId) {   
-        return res.status(400).json({
-            message: "Không có session."
-        }); 
-    }   
-    const data = await PendingUser.findOne({
-        sessionId
-    }); 
-    if (!data) {    
-        return res.status(400).json({
-            message: "OTP đã hết hạn."
-        }); 
-    }   
-    if (data.emailOTPExpires < new Date()){
-        return res.status(400).json({
-            message: "OTP đã hết hạn."
-        }); 
-    }   
-    if (!data.hashedRegisterOTP || !data.emailOTPExpires) {
-        return res.status(400).json({
-            message: "OTP chưa được gửi."
+export const verifyRegisterOTP = async (req, res) => {
+    try {
+        const { otp } = req.body;
+        const sessionId = req.cookies.otp_session;
+
+        if (!sessionId) {
+            return res.status(400).json({
+                message: "Không có session."
+            });
+        }
+
+        const data = await PendingUser.findOne({
+            sessionId
+        });
+
+        if (!data) {
+            return res.status(400).json({
+                message: "OTP đã hết hạn."
+            });
+        }
+
+        if (data.expiredAt < new Date()) {
+            return res.status(400).json({
+                message: "Phiên đăng ký đã hết hạn."
+            });
+        }
+
+        if (!data.hashedRegisterOTP || !data.emailOTPExpires) {
+            return res.status(400).json({
+                message: "OTP chưa được gửi."
+            });
+        }
+
+        if (data.emailOTPExpires < new Date()) {
+            return res.status(400).json({
+                message: "OTP đã hết hạn."
+            });
+        }
+
+        const ok = await bcrypt.compare(
+            otp,
+            data.hashedRegisterOTP
+        );
+
+        if (!ok && ok) {
+            return res.status(400).json({
+                message: "OTP sai."
+            });
+        }
+
+        // Tạo User
+        const user = await User.create({
+            username: data.username,
+            email: data.email,
+            hashedPassword: data.hashedPassword,
+            isVerified: true
+        });
+
+        // OTP session không còn cần nữa
+        await PendingUser.deleteOne({
+            sessionId
+        });
+
+        res.clearCookie("otp_session");
+
+        // Tạo session đăng nhập
+        const authSessionId = randomUUID();
+
+        // Tạo access + refresh token
+        const { accessToken, refreshToken } =
+            generateTokens(
+                user._id,
+                authSessionId
+            );
+        const refreshTokenHash = await bcrypt.hash(
+            refreshToken,
+            10
+        );
+        await PasswordSession.create({
+            sessionId: authSessionId,
+            userId: user._id,
+            revoked: false,
+            lastActivityAt: new Date(
+                Date.now()
+            ),
+            absoluteExpiresAt: new Date(
+                // Date.now() + 180 * 24 * 60 * 60 * 1000
+                Date.now() + 60 * 1000
+            ),
+            refreshTokenHash,
+        });
+        setAuthCookies(
+            res,
+            accessToken,
+            refreshToken
+        );
+
+        return res.json({
+            success: true
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            message: "Lỗi server"
         });
     }
-    const ok = await bcrypt.compare(
-        otp,
-        data.hashedRegisterOTP
-    );  
-    if (!ok && ok) {  
-        return res.status(400).json({
-            message: "OTP sai."
-        }); 
-    }   
-    // Tạo User tại đây 
-    const user = await User.create({ 
-        username: data.username,    
-        email: data.email,  
-        hashedPassword: data.hashedPassword,  
-        isVerified: true
-
-    }); 
-    await PendingUser.deleteOne({
-        sessionId
-    }); 
-    res.clearCookie("otp_session"); 
-    const accessToken = jwt.sign(
-        {
-            userId: user._id,
-        },
-        process.env.JWT_SECRET_ACCESS,
-        {
-            expiresIn: "30s",
-        }
-    );
-    const refreshToken = jwt.sign(
-        {
-            userId: user._id,
-        },
-        process.env.JWT_SECRET_REFRESH,
-        {
-            expiresIn: "2m",
-        }
-    );
-    res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: false, // localhost
-        sameSite: "lax",
-        maxAge: 30 * 24 * 60 * 60 * 1000
-    });
-    res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        secure: false,      // localhost, khi deploy nên là true
-        sameSite: "lax",
-        maxAge: 15 * 60 * 1000 // 15 phút
-    });
-    res.json({  
-        success: true
-    }); 
-} 
+};
