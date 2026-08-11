@@ -26,9 +26,12 @@ const dailyChallengeShema = mongoose.Schema({
         completion: Boolean
     }
 })
-
+dailyChallengeSchema.index(
+    { userId: 1, date: 1 },
+    { unique: true }
+);
 
 export default mongoose.model(
-    "PasswordSession",
-    passwordSchema
+    "DailyChallenge",
+    dailyChallengeShema
 );
