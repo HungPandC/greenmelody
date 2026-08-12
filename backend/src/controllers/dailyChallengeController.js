@@ -24,12 +24,39 @@ export const setNewDailyChallenge = async (req,res)=>{
             stars: 0
         },
         rewards: {
-            checkpoint30: false,
-            checkpoint70: false,
-            completion: false
-        }
+            practiceTime: {
+                checkpoint30: false,
+                checkpoint70: false,
+                completion: false
+            },
+
+            exercises: {
+                checkpoint30: false,
+                checkpoint70: false,
+                completion: false
+            },
+
+            stars: {
+                checkpoint30: false,
+                checkpoint70: false,
+                completion: false
+            }
+        },
     });
 }       
 export const updateDailyChallenge = async (req,res)=>{
+    const { practiceTime, exercises, stars } = req.body.progress;
+    const challenge = await DailyChallenge.findOne({
+        userId : req.user.userId,
+        date: { $lte: today }
+    })
+    .sort({ date: -1 });
+
+    const progress = challenge.progress;
     
+    progress.practiceTime = practiceTime;
+    progress.exercises = exercises;
+    progress.stars = stars;
+
+    await challenge.save();
 }

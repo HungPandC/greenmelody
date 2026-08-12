@@ -21,10 +21,28 @@ const dailyChallengeShema = mongoose.Schema({
         stars: Number
     },
     rewards: {
-        checkpoint30: Boolean,
-        checkpoint70: Boolean,
-        completion: Boolean
-    }
+        practiceTime: {
+            checkpoint30: Boolean,
+            checkpoint70: Boolean,
+            completion: Boolean
+        },
+
+        exercises: {
+            checkpoint30: Boolean,
+            checkpoint70: Boolean,
+            completion: Boolean
+        },
+
+        stars: {
+            checkpoint30: Boolean,
+            checkpoint70: Boolean,
+            completion: Boolean
+        }
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
 })
 dailyChallengeSchema.index(
     { userId: 1, date: 1 },
