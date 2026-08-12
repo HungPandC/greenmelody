@@ -1,3 +1,5 @@
+import { completion } from "yargs";
+
 const rewardScaleStart = {
     practiceTime: 30,
     exercises: 25,
@@ -7,12 +9,6 @@ const rewardTiers = {
     tier1: 1,
     tier2: 1.5,
     tier3: 2
-};
-
-const baseRewards = {
-    coin: 20,
-    gem: 2,
-    wateringCan: 1
 };
 
 const checkpointRewards = {
@@ -55,6 +51,78 @@ const starTiers = {
 
     15: 3
 };
-export const getRewardScale = async (practiceTime, exercises, stars) => {
-    // tính difficulty / reward scale
+const commonRewards = {
+    gem: {
+        rewardType: "gem",
+        weight: 30,
+        baseAmount: 3,
+    },
+    coin: {
+        rewardType: "coin",
+        weight: 30,
+        baseAmount: 20,
+    },
+    wateringCan: {
+        rewardType: "wateringCan",
+        weight: 30,
+        baseAmount: 1,
+    },
+}
+const getRewardScale = (practiceTimeTarget, exercisesTarget, starsTarget) => {
+    // Challenge khó đến mức nào?
+    const canScalePracticeTime =
+        practiceTimeTarget >= rewardScaleStart.practiceTime;
+
+    const canScaleExercises =
+        exercisesTarget >= rewardScaleStart.exercises;
+
+    const canScaleStars =
+        starsTarget >= rewardScaleStart.stars;
+
+    const practiceTimeTier = practiceTimeTiers[practiceTimeTarget];
+    const exercisesTier = exerciseTiers[exercisesTarget];
+    const starsTier = starTiers[starsTarget];
+
+    if (!practiceTimeTier || !exercisesTier || !starsTier) {
+        throw new Error("Invalid challenge target");
+    }
+
+    const data = {};
+    let dataPracticeTime = {}
+    //practiceTime
+    if(canScalePracticeTime){
+        dataPracticeTime = {
+            canScale: canScalePracticeTime,
+            reward30: checkpointRewards.checkpoint30 * practiceTimeTier,
+            reward70: checkpointRewards.checkpoint70 * practiceTimeTier,
+            completion: checkpointRewards.completion * practiceTimeTier,
+        }
+    }else{
+        dataPracticeTime = {
+            canScale: canScalePracticeTime,
+            completion: 1,
+        }
+    }
+
+
+
+    return data;
 };
+export const getRandomReward = (pool) => {
+    //random theo phan tram
+    const totalWeight = items.reduce(
+        (sum, item) => sum + item.weight,
+        0
+    );
+    let random = Math.floor(Math.random() * totalWeight);
+    for (const item of items) {
+        random -= item.weight;
+        if (random < 0) {
+            return item;
+        }
+    }
+}
+export const calculateRewardAmount = ()=>{
+    //user nhận BAO NHIÊU?
+    return 
+}
