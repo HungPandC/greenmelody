@@ -1,3 +1,4 @@
+import { completion } from "yargs";
 
 const rewardScaleStart = {
     practiceTime: 30,
@@ -176,8 +177,6 @@ export const updateChallengeProgress = async (userId, progress) => {
 
     return await challenge.save();
 };
-// dailyChallengeService.js
-
 export const createDailyChallenge = async (userId, targets) => {
     const tomorrow = new Date();
 
@@ -246,3 +245,38 @@ export const createDailyChallenge = async (userId, targets) => {
         }
     });
 };
+export const rewardDailyChallenge = (challenge,progress)=> {
+    function CheckCanReward(isRewardable,key){
+        if(isRewardable){
+            // check loai
+            // tim trong reward
+            // loai bo claimed
+            return
+        }
+    }
+
+    const canRewardPracticeTime = progress.practiceTime >= challenge.targets.practiceTime;
+    const canRewardExercises = progress.exercises >= challenge.targets.exercises;
+    const canRewardStars = progress.stars >= challenge.targets.stars;
+
+
+    const needCheckScalePracticeTime = challenge.targets.practiceTime >= rewardScaleStart.practiceTime;
+    const needCheckScaleExercises = challenge.targets.exercises >= rewardScaleStart.exercises;
+    const needCheckScaleStars = challenge.targets.stars >= rewardScaleStart.stars;
+
+    const factor =  [ 0.3 , 0.7 , 1 ]
+    const checkpoint = ["checkpoint30","checkpoint70","completion"]
+    if(needCheckScalePracticeTime){
+        for(let i = 0; i < 3;i++){
+            if((progress.practiceTime - challenge.targets.practiceTime * factor[i]) >= 0) {
+                
+            }
+        }
+    }
+    //tra ve true/false de cai ham tinh tien xu li
+
+
+    // check xem co phai la don vi tien hay ko
+    // neu la don vi tien thi sai changeCurrency
+    // neu nhu la kieu binh nuoc thi se them vao inventory
+}
