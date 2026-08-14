@@ -1,4 +1,3 @@
-import { completion } from "yargs";
 
 const rewardScaleStart = {
     practiceTime: 30,
@@ -87,42 +86,163 @@ const getRewardScale = (practiceTimeTarget, exercisesTarget, starsTarget) => {
         throw new Error("Invalid challenge target");
     }
 
-    const data = {};
-    let dataPracticeTime = {}
-    //practiceTime
-    if(canScalePracticeTime){
-        dataPracticeTime = {
-            canScale: canScalePracticeTime,
-            reward30: checkpointRewards.checkpoint30 * practiceTimeTier,
-            reward70: checkpointRewards.checkpoint70 * practiceTimeTier,
-            completion: checkpointRewards.completion * practiceTimeTier,
+    const dataArr = [practiceTimeTier,exercisesTier,starsTier];
+    const dataCanScale = [canScalePracticeTime,canScaleExercises,canScaleStars];
+    const keys = ["practiceTime", "exercises", "stars"];
+
+    return dataArr.reduce((result, tier, index) => {
+        if (dataCanScale[index]) {
+            result[keys[index]] = {
+                canScale: true,
+                checkpoint30: checkpointRewards.checkpoint30 * tier,
+                checkpoint70: checkpointRewards.checkpoint70 * tier,
+                completion: checkpointRewards.completion * tier,
+            };
+        } else {
+            result[keys[index]] = {
+                canScale: false,
+                completion: 1,
+            };
         }
-    }else{
-        dataPracticeTime = {
-            canScale: canScalePracticeTime,
-            completion: 1,
-        }
-    }
 
-
-
-    return data;
+        return result;
+    }, {});
 };
-export const getRandomReward = (pool) => {
-    //random theo phan tram
+export const getRandomReward = () => {
+    const items = Object.values(commonRewards);
+
     const totalWeight = items.reduce(
         (sum, item) => sum + item.weight,
         0
     );
+
     let random = Math.floor(Math.random() * totalWeight);
+
     for (const item of items) {
         random -= item.weight;
+
         if (random < 0) {
             return item;
         }
     }
-}
-export const calculateRewardAmount = ()=>{
+};
+export const calculateRewardAmount = (practiceTime,exercises,stars)=>{
     //user nhận BAO NHIÊU?
-    return 
+    const multiplier = getRewardScale(practiceTime,exercises,stars);
+    const checkpoints = ["checkpoint30", "checkpoint70", "completion"];
+
+    const createRewards = (key) => {
+        const canScale = multiplier[key].canScale;
+
+        return checkpoints
+            .filter(checkpoint => canScale || checkpoint === "completion")
+            .reduce((result, checkpoint) => {
+                const reward = getRandomReward();
+
+                result[checkpoint] = {
+                    rewardType: reward.rewardType,
+                    amount: reward.baseAmount * multiplier[key][checkpoint]
+                };
+
+                return result;
+            }, {
+                canScale
+            });
+    };
+    const rewardPracticeTime = createRewards("practiceTime");
+    const rewardExercises = createRewards("exercises");
+    const rewardStars = createRewards("stars");
+
+    return {
+        rewardPracticeTime,
+        rewardExercises,
+        rewardStars,
+    };
 }
+export const updateChallengeProgress = async (userId, progress) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const challenge = await DailyChallenge.findOne({
+        userId,
+        date: { $lte: today }
+    }).sort({ date: -1 });
+
+    if (!challenge) {
+        throw new Error("Daily challenge not found");
+    }
+
+    challenge.progress = progress;
+
+    return await challenge.save();
+};
+// dailyChallengeService.js
+
+export const createDailyChallenge = async (userId, targets) => {
+    const tomorrow = new Date();
+
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    const rewards = calculateRewardAmount(
+        targets.practiceTime,
+        targets.exercises,
+        targets.stars
+    );
+
+    return await DailyChallenge.create({
+        userId,
+        date: tomorrow,
+
+        targets,
+
+        progress: {
+            practiceTime: 0,
+            exercises: 0,
+            stars: 0
+        },
+
+        rewards: {
+            practiceTime: {
+                canScale: rewards.rewardPracticeTime.canScale,
+                checkpoint30: rewards.rewardPracticeTime.checkpoint30,
+                checkpoint70: rewards.rewardPracticeTime.checkpoint70,
+                completion: rewards.rewardPracticeTime.completion
+            },
+
+            exercises: {
+                canScale: rewards.rewardExercises.canScale,
+                checkpoint30: rewards.rewardExercises.checkpoint30,
+                checkpoint70: rewards.rewardExercises.checkpoint70,
+                completion: rewards.rewardExercises.completion
+            },
+
+            stars: {
+                canScale: rewards.rewardStars.canScale,
+                checkpoint30: rewards.rewardStars.checkpoint30,
+                checkpoint70: rewards.rewardStars.checkpoint70,
+                completion: rewards.rewardStars.completion
+            }
+        },
+
+        claimed: {
+            practiceTime: {
+                checkpoint30: false,
+                checkpoint70: false,
+                completion: false
+            },
+
+            exercises: {
+                checkpoint30: false,
+                checkpoint70: false,
+                completion: false
+            },
+
+            stars: {
+                checkpoint30: false,
+                checkpoint70: false,
+                completion: false
+            }
+        }
+    });
+};

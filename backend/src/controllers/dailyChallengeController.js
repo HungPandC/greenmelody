@@ -44,19 +44,11 @@ export const setNewDailyChallenge = async (req,res)=>{
         },
     });
 }       
-export const updateDailyChallenge = async (req,res)=>{
-    const { practiceTime, exercises, stars } = req.body.progress;
-    const challenge = await DailyChallenge.findOne({
-        userId : req.user.userId,
-        date: { $lte: today }
-    })
-    .sort({ date: -1 });
+export const updateDailyChallenge = async (req, res) => {
+    const challenge = await updateChallengeProgress(
+        req.user.userId,
+        req.body.progress
+    );
 
-    const progress = challenge.progress;
-    
-    progress.practiceTime = practiceTime;
-    progress.exercises = exercises;
-    progress.stars = stars;
-
-    await challenge.save();
-}
+    res.json({ challenge });
+};
