@@ -1,0 +1,94 @@
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  max-width: 620px;
+}
+
+.stageRow {
+  display: flex;
+  gap: 20px;
+}
+
+.stageDotCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stageDot {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.stageLine {
+  width: 2px;
+  flex: 1;
+  background: var(--border);
+  margin: 6px 0;
+  min-height: 30px;
+}
+
+.stageCard {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.stageCard:hover {
+  border-color: #cfd8d1;
+}
+
+.stageHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.stageHead h3 {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.stagePct {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-mut);
+}
+
+.stageCard p {
+  font-size: 12.5px;
+  color: var(--text-mut);
+  margin-bottom: 12px;
+}
+
+.stageTrack {
+  height: 8px;
+  border-radius: 99px;
+  background: #eef0ec;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.stageFill {
+  height: 100%;
+  border-radius: 99px;
+}
+
+.stageCount {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-mut);
+}

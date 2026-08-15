@@ -105,10 +105,6 @@ function Login(){
                     {password_error.length > 0 &&
                     <p className="field-error">{password_error[0]}</p>}
                 </div>
-                <div className="row-between">
-                    <span></span>
-                    <a onClick={() => navigate("/forgot-password")}>Quên mật khẩu?</a>
-                </div>
                 <p className="form-error"></p>
                 <button
                     className="btn-submit"

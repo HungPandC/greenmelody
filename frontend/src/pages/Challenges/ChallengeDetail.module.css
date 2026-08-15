@@ -1,0 +1,122 @@
+.card {
+  max-width: 480px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+  text-align: center;
+}
+
+.iconBig {
+  font-size: 44px;
+  margin-bottom: 10px;
+}
+
+.card h2 {
+  font-size: 19px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.progressText {
+  font-size: 13px;
+  color: var(--text-mut);
+  margin-bottom: 24px;
+}
+
+.track {
+  position: relative;
+  height: 10px;
+  background: #eef0ec;
+  border-radius: 99px;
+  margin: 0 0 30px;
+}
+
+.fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+
+.checkpoint {
+  position: absolute;
+  top: -7px;
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--green-dark);
+}
+
+.checkpointDone {
+  border-color: var(--green);
+  background: var(--green-light);
+}
+
+.rewardRow {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.rewardItem {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  background: var(--green-light);
+  padding: 8px 16px;
+  border-radius: 10px;
+}
+
+.claimBtn {
+  width: 100%;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 14.5px;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.claimedMsg {
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-bottom: 12px;
+}
+
+.continueBtn {
+  width: 100%;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 14.5px;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.backBtn {
+  width: 100%;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  color: var(--text-mut);
+}

@@ -1,0 +1,132 @@
+/* ---------- Header của trang ---------- */
+.pageHead{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  gap:20px;flex-wrap:wrap;margin-bottom:24px;
+}
+.pageHeadLeft{display:flex;align-items:center;gap:16px;}
+.pageIcon{
+  width:56px;height:56px;border-radius:16px;
+  background:var(--green-light);color:var(--green-dark);
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  flex-shrink:0;
+}
+.pageTitle h1{font-size:24px;font-weight:800;margin-bottom:4px;}
+.pageTitle p{font-size:13.5px;color:var(--text-mut);}
+
+.totalProgressCard{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:16px 20px;min-width:260px;
+}
+.totalProgressTop{
+  display:flex;justify-content:space-between;align-items:baseline;
+  margin-bottom:10px;font-size:13px;font-weight:700;color:var(--text-mut);
+}
+.totalProgressTop b{font-size:14px;color:var(--text);}
+.totalProgressTrack{
+  height:8px;border-radius:99px;background:#eef0ec;overflow:hidden;margin-bottom:8px;
+}
+.totalProgressFill{height:100%;border-radius:99px;background:var(--green);}
+.totalProgressSub{font-size:12px;color:var(--text-mut);}
+
+/* ---------- Nhóm kỹ năng ---------- */
+.groupLabel{
+  display:flex;align-items:center;gap:8px;
+  font-size:12.5px;font-weight:800;letter-spacing:.04em;
+  color:var(--text-mut);margin:26px 0 12px;
+}
+.groupLabel::before{
+  content:"";width:8px;height:8px;border-radius:50%;
+  background:var(--dot,var(--green));flex-shrink:0;
+}
+
+.skillGrid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+}
+
+.skillCard{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:18px;padding:20px;
+  display:flex;flex-direction:column;
+  transition:border-color .15s ease,transform .15s ease;
+  cursor:pointer;
+}
+.skillCard:hover{border-color:#cfd8d1;transform:translateY(-2px);}
+
+.skillArt{
+  height:76px;border-radius:12px;
+  background:var(--art-bg,var(--green-light));
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;margin-bottom:14px;
+}
+
+.skillCard h3{font-size:15.5px;font-weight:800;margin-bottom:4px;}
+.skillCard p{font-size:12.5px;color:var(--text-mut);line-height:1.45;margin-bottom:16px;min-height:34px;}
+
+.skillFoot{display:flex;align-items:center;gap:10px;margin-top:auto;}
+.skillTrack{flex:1;height:7px;border-radius:99px;background:#eef0ec;overflow:hidden;}
+.skillFill{height:100%;border-radius:99px;background:var(--fill,var(--green));}
+.skillPct{font-size:12px;font-weight:800;width:34px;text-align:right;color:var(--text);}
+
+.skillMeta{
+  display:flex;justify-content:space-between;align-items:center;margin-top:10px;
+}
+.skillCount{font-size:11.5px;font-weight:700;color:var(--text-mut);}
+.skillGo{
+  width:30px;height:30px;border-radius:50%;background:var(--green-light);
+  color:var(--green-dark);display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;
+}
+
+.hint{
+  margin-top:28px;text-align:center;font-size:12.5px;color:var(--text-mut);
+}
+
+/* ---------- Sidebar phải ---------- */
+.overviewCard{text-align:center;}
+.donutWrap{
+  width:150px;height:150px;margin:6px auto 12px;position:relative;
+  border-radius:50%;
+  background:conic-gradient(var(--green) calc(var(--pct,53)*1%),#eef0ec 0);
+  display:flex;align-items:center;justify-content:center;
+}
+.donutWrap::before{
+  content:"";position:absolute;width:112px;height:112px;border-radius:50%;background:var(--card);
+}
+.donutInner{position:relative;z-index:2;}
+.donutPct{font-size:26px;font-weight:800;display:block;}
+.donutSub{font-size:11.5px;color:var(--text-mut);}
+
+.sparkline{display:block;margin-top:6px;}
+
+.streakBig{display:flex;align-items:center;gap:14px;}
+.streakEmoji{font-size:30px;}
+.streakNum{font-size:22px;font-weight:800;color:var(--orange);line-height:1.1;}
+.streakLabel{font-size:12.5px;color:var(--text-mut);margin-top:2px;}
+
+.rewardRow{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;font-size:13.5px;
+}
+.rewardRow:not(:last-child){border-bottom:1px solid var(--border);}
+.rewardLabel{display:flex;align-items:center;gap:8px;color:var(--text-mut);}
+.rewardVal{font-weight:800;font-size:14px;}
+
+.todayGoalRow{display:flex;align-items:center;gap:12px;}
+.todayGoalIcon{font-size:24px;}
+.todayGoalBody{flex:1;}
+.todayGoalBody p{font-size:13.5px;font-weight:700;margin-bottom:8px;}
+.todayGoalTrack{height:8px;background:#eef0ec;border-radius:99px;overflow:hidden;margin-bottom:5px;}
+.todayGoalFill{height:100%;background:var(--green);border-radius:99px;}
+.todayGoalNum{font-size:12px;color:var(--text-mut);font-weight:600;}
+
+@media(max-width:1050px){
+  .side{display:none;}
+}
+@media(max-width:900px){
+  .skillGrid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:600px){
+  .skillGrid{grid-template-columns:1fr;}
+  .pageHead{flex-direction:column;}
+  .totalProgressCard{width:100%;}
+}
