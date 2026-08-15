@@ -1,5 +1,6 @@
-import { completion } from "yargs";
 
+import { changeCurrency} from "./economyService";
+import { changeInventory } from "./inventoryService";
 const rewardScaleStart = {
     practiceTime: 30,
     exercises: 25,
@@ -138,11 +139,13 @@ export const calculateRewardAmount = (practiceTime,exercises,stars)=>{
         return checkpoints
             .filter(checkpoint => canScale || checkpoint === "completion")
             .reduce((result, checkpoint) => {
-                const reward = getRandomReward();
+                const rewards = getRandomReward();
 
                 result[checkpoint] = {
-                    rewardType: reward.rewardType,
-                    amount: reward.baseAmount * multiplier[key][checkpoint]
+                    rewardType: rewards.rewardType,
+                    amount: Math.floor(
+                        rewards.baseAmount * multiplier[key][checkpoint]
+                    )                
                 };
 
                 return result;
@@ -245,38 +248,121 @@ export const createDailyChallenge = async (userId, targets) => {
         }
     });
 };
-export const rewardDailyChallenge = (challenge,progress)=> {
-    function CheckCanReward(isRewardable,key){
-        if(isRewardable){
-            // check loai
-            // tim trong reward
-            // loai bo claimed
-            return
-        }
-    }
+export const rewardDailyChallenge = async (
+    challenge,
+    userId,
+    progress
 
-    const canRewardPracticeTime = progress.practiceTime >= challenge.targets.practiceTime;
-    const canRewardExercises = progress.exercises >= challenge.targets.exercises;
-    const canRewardStars = progress.stars >= challenge.targets.stars;
+) => {
 
+    const session = await mongoose.startSession();
 
-    const needCheckScalePracticeTime = challenge.targets.practiceTime >= rewardScaleStart.practiceTime;
-    const needCheckScaleExercises = challenge.targets.exercises >= rewardScaleStart.exercises;
-    const needCheckScaleStars = challenge.targets.stars >= rewardScaleStart.stars;
+    try {
 
-    const factor =  [ 0.3 , 0.7 , 1 ]
-    const checkpoint = ["checkpoint30","checkpoint70","completion"]
-    if(needCheckScalePracticeTime){
-        for(let i = 0; i < 3;i++){
-            if((progress.practiceTime - challenge.targets.practiceTime * factor[i]) >= 0) {
-                
+        session.startTransaction();
+
+        const factor = [0.3, 0.7, 1];
+
+        const checkpoints = [
+            "checkpoint30",
+            "checkpoint70",
+            "completion"
+        ];
+
+        const keys = [
+            "practiceTime",
+            "exercises",
+            "stars"
+        ];
+
+        for (let index = 0; index < keys.length; index++) {
+
+            const key = keys[index];
+
+            const target = challenge.targets[key];
+
+            const canScale =
+                target >= rewardScaleStart[key];
+
+            // Nếu target chưa đủ để scale
+            // thì chỉ có completion
+            const checkpointCount = canScale ? 3 : 1;
+
+            for (let i = 0; i < checkpointCount; i++) {
+
+                const checkpoint = checkpoints[i];
+
+                const requiredProgress =
+                    Math.floor(target * factor[i]);
+
+                const reached =
+                    progress[key] >= requiredProgress;
+
+                const alreadyClaimed =
+                    challenge.claimed[key][checkpoint];
+
+                if (!reached || alreadyClaimed) {
+                    continue;
+                }
+
+                const reward =
+                    challenge.rewards[key][checkpoint];
+
+                const rewardType =
+                    reward.rewardType;
+
+                const rewardAmount =
+                    reward.amount;
+
+                // ================= REWARD =================
+
+                if (
+                    ["COIN", "GEM"].includes(
+                        rewardType.toUpperCase()
+                    )
+                ) {
+
+                    await changeCurrency({
+                        userId,
+                        currency: rewardType.toUpperCase(),
+                        amount: rewardAmount,
+                        type: "ADD",
+                        reason: "DAILY_REWARD",
+                        session
+                    });
+
+                } else {
+
+                    await changeInventory({
+                        userId,
+                        itemId: rewardType,
+                        amount: rewardAmount,
+                        type: "ADD",
+                        session
+                    });
+                }
+
+                // ================= CLAIM =================
+
+                challenge.claimed[key][checkpoint] = true;
             }
         }
+
+        // Lưu tất cả claimed trong cùng transaction
+        await challenge.save({ session });
+
+        await session.commitTransaction();
+
+        return challenge;
+
+    } catch (error) {
+
+        await session.abortTransaction();
+
+        throw error;
+
+    } finally {
+
+        await session.endSession();
     }
-    //tra ve true/false de cai ham tinh tien xu li
-
-
-    // check xem co phai la don vi tien hay ko
-    // neu la don vi tien thi sai changeCurrency
-    // neu nhu la kieu binh nuoc thi se them vao inventory
-}
+};

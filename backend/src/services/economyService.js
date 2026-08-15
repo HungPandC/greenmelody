@@ -3,12 +3,23 @@ import mongoose from "mongoose";
 import User from "../models/User.js";
 
 
+// ================= VALIDATION =================
+
 const validateAmount = (amount) => {
     if (!Number.isInteger(amount) || amount <= 0) {
         throw new Error("Invalid amount");
     }
 };
-const changeCurrency = async (userId,currency,amount,type,reason) => {
+
+
+export const changeCurrency = async ({
+    userId,
+    currency,
+    amount,
+    type,
+    reason,
+    session: externalSession
+}) => {
 
     validateAmount(amount);
 
@@ -24,11 +35,15 @@ const changeCurrency = async (userId,currency,amount,type,reason) => {
         ? "coin"
         : "gem";
 
-    const session = await mongoose.startSession();
+    const session = externalSession ?? await mongoose.startSession();
+
+    const isOwnSession = !externalSession;
 
     try {
 
-        session.startTransaction();
+        if (isOwnSession) {
+            session.startTransaction();
+        }
 
         let updatedUser;
 
@@ -57,11 +72,10 @@ const changeCurrency = async (userId,currency,amount,type,reason) => {
                     `Not enough ${currency.toLowerCase()}`
                 );
             }
-        }
 
         // ================= ADD =================
 
-        if (type === "ADD") {
+        } else {
 
             updatedUser = await User.findOneAndUpdate(
                 {
@@ -96,77 +110,110 @@ const changeCurrency = async (userId,currency,amount,type,reason) => {
             { session }
         );
 
-        await session.commitTransaction();
+        if (isOwnSession) {
+            await session.commitTransaction();
+        }
 
         return updatedUser;
 
     } catch (error) {
 
-        await session.abortTransaction();
+        if (isOwnSession) {
+            await session.abortTransaction();
+        }
 
         throw error;
 
     } finally {
 
-        await session.endSession();
-
+        if (isOwnSession) {
+            await session.endSession();
+        }
     }
 };
 
+
 // ================= COIN =================
 
-export const addCoin = (userId, amount, reason = "Add coin") => {
-    return changeCurrency(
+export const addCoin = ({
+    userId,
+    amount,
+    reason = "Add coin"
+}) => {
+
+    return changeCurrency({
         userId,
-        "COIN",
+        currency: "COIN",
         amount,
-        "ADD",
+        type: "ADD",
         reason
-    );
+    });
 };
 
 
+export const spendCoin = ({
+    userId,
+    amount,
+    reason = "Spend coin"
+}) => {
 
-export const spendCoin = (userId, amount, reason = "Spend coin") => {
-    return changeCurrency(
+    return changeCurrency({
         userId,
-        "COIN",
+        currency: "COIN",
         amount,
-        "SPEND",
+        type: "SPEND",
         reason
-    );
+    });
 };
-
 
 
 // ================= GEM =================
 
+export const addGem = ({
+    userId,
+    amount,
+    reason = "Add gem"
+}) => {
 
-export const addGem = (userId, amount, reason = "Add gem") => {
-    return changeCurrency(
+    return changeCurrency({
         userId,
-        "GEM",
+        currency: "GEM",
         amount,
-        "ADD",
+        type: "ADD",
         reason
-    );
+    });
 };
 
 
+export const spendGem = ({
+    userId,
+    amount,
+    reason = "Spend gem"
+}) => {
 
-export const spendGem = (userId, amount, reason = "Spend gem") => {
-    return changeCurrency(
+    return changeCurrency({
         userId,
-        "GEM",
+        currency: "GEM",
         amount,
-        "SPEND",
+        type: "SPEND",
         reason
-    );
+    });
 };
 
-// export const claimDailyReward = async () => {
 
-// }
-// export const addPlainXP = async () => {
+// ================= OTHER REWARDS =================
 
-// }
+// export const claimDailyReward = async ({
+//     userId,
+//     ...
+// }) => {
+//
+// };
+
+
+// export const addPlainXP = async ({
+//     userId,
+//     amount
+// }) => {
+//
+// };

@@ -20,6 +20,8 @@ const bannedWords = [
 // Common validators
 const usernameValidator = () =>
     body("username")
+        .isString()
+        .withMessage("Tên phải là chuỗi")
         .trim()
         .notEmpty()
         .withMessage("Tên không được để trống")
@@ -64,15 +66,14 @@ const usernameValidator = () =>
 
 const emailValidator = () =>
     body("email")
+        .isString()
+        .withMessage("Email phải là chuỗi")
         .trim()
         .normalizeEmail()
-
         .notEmpty()
         .withMessage("Email không được để trống")
-
         .isEmail()
         .withMessage("Email không hợp lệ")
-
         .isLength({ max: 254 })
         .withMessage("Email quá dài")
 
@@ -86,6 +87,8 @@ const emailValidator = () =>
 
 const passwordValidator = (field = "password") =>
     body(field)
+        .isString()
+        .withMessage("Mật khẩu phải là chuỗi")
         .notEmpty()
         .withMessage("Mật khẩu không được để trống")
 
@@ -133,10 +136,10 @@ const loginPasswordValidator = () =>
 
 const otpValidator = () =>
     body("otp")
+        .isString()
+        .withMessage("OTP phải là chuỗi")
         .trim()
         .notEmpty()
-        .withMessage("OTP không được để trống")
-
         .matches(/^\d{6}$/)
         .withMessage("OTP phải gồm đúng 6 chữ số");
 // REGISTER

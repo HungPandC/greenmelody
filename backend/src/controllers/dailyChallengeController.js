@@ -1,7 +1,6 @@
 import User from "../models/User";
 import DailyChallenge from "../models/DailyChallenge";
-import { updateChallengeProgress } from "../services/rewardService";
-
+import { updateChallengeProgress,createDailyChallenge,rewardDailyChallenge } from "../services/rewardService";
 
 
 
@@ -15,20 +14,22 @@ export const setNewDailyChallenge = async (req, res) => {
         req.user.userId,
         req.body.targets
     );
-
     res.status(201).json({
         message: "Daily challenge created",
         challenge
     });
 };
-const rewardDailyChallenge = async (req,res) => {
-    
-}
 export const updateDailyChallenge = async (req, res) => {
+    const userId = req.user.userId;
+    const progress = req.body.progress;
     const challenge = await updateChallengeProgress(
-        req.user.userId,
-        req.body.progress
+        userId,
+        progress,
     );
-
+    const reward = await rewardDailyChallenge(
+        challenge,
+        userId,
+        progress
+    )
     res.json({ challenge });
 };
