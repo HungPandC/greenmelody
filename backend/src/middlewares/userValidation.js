@@ -209,9 +209,12 @@ export async function authenticate(req, res, next) {
             token,
             process.env.JWT_SECRET_ACCESS
         );
-
+        if (decoded.type !== "access") {
+            return res.status(401).json({
+                message: "Token không hợp lệ"
+            });
+        }
         req.user = decoded;
-        console.log("access con han")
         return next();
     } catch (error) {
 
@@ -234,6 +237,11 @@ export async function authenticate(req, res, next) {
                     refresh,
                     process.env.JWT_SECRET_REFRESH
                 );
+                if (decodedRefresh.type !== "refresh") {
+                    return res.status(401).json({
+                        message: "Refresh token không hợp lệ"
+                    });
+                }
 
                 // =========================
                 // 3. Tìm session tương ứng

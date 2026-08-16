@@ -7,7 +7,9 @@ import { logout } from "../../services/authService";
 const navItems = [
     { icon: "🏠", label: "Trang chủ", path: "/home" },
     { icon: "🗺️", label: "Hành trình", path: "/journey" },
+    { icon: "🌱", label: "Trồng cây", path: "/garden" },
     { icon: "🎧", label: "Cảm âm", path: "/ear-training" },
+    { icon: "👁️", label: "Đọc nhạc", path: "/reading" },
     { icon: "🎹", label: "Thực hành", path: "/practice" },
     { icon: "🏆", label: "Thử thách", path: "/challenges" },
     { icon: "👤", label: "Hồ sơ", path: "/profile" },

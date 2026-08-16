@@ -1,0 +1,88 @@
+.plantCard {
+  background: linear-gradient(160deg, #dff3e4, #eef8ee);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  margin-bottom: 20px;
+  max-width: 600px;
+}
+
+.plantArt {
+  font-size: 72px;
+  margin-bottom: 16px;
+}
+
+.plantTrack {
+  height: 12px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.plantFill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--green);
+  transition: width 0.3s ease;
+}
+
+.plantPct {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--green-dark);
+}
+
+.actionsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  max-width: 600px;
+}
+
+.actionCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.actionIcon {
+  font-size: 26px;
+}
+
+.actionCard h3 {
+  font-size: 14.5px;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.actionCard p {
+  font-size: 12.5px;
+  color: var(--text-mut);
+}
+
+.actionBtn {
+  margin-top: auto;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  padding: 11px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.actionBtn:disabled {
+  background: var(--border);
+  color: var(--text-mut);
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .actionsRow { grid-template-columns: 1fr; }
+}

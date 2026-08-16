@@ -6,11 +6,14 @@ import "./style/auth.css"
 import "./style/app.css"
 import App from './App.tsx'
 import AuthProvider from './context/AuthProvider.tsx'
+import GameStateProvider from './context/GameStateProvider.tsx'
 
 createRoot(document.getElementById("root")!).render(
   <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
     <AuthProvider>
-      <App />
+      <GameStateProvider>
+        <App />
+      </GameStateProvider>
     </AuthProvider>
   </GoogleOAuthProvider>
 );

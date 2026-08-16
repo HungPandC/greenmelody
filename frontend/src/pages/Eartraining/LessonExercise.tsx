@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styles from "./LessonExercise.module.css";
-import { mockExercise } from "../../data/mockLessons";
-import { skillLessons, skillMeta } from "../../data/mockLessons";
+import { mockExercise, skillLessons, skillMeta } from "../../data/mockLessons";
+import useGameState from "../../hooks/useGameState";
 
-// State machine đơn giản cho 1 câu hỏi: chưa chọn -> đã chọn -> đã submit (hiện đúng/sai)
 type QuestionState = "idle" | "selected" | "submitted";
 
-function LessonExercise() {
+type Props = {
+    basePath?: string; // xem giải thích trong SkillLessonList.tsx
+};
+
+function LessonExercise({ basePath = "/ear-training" }: Props) {
     const { skill, lessonId } = useParams<{ skill: string; lessonId: string }>();
     const navigate = useNavigate();
+    const { addCoins, addXp } = useGameState();
 
     const [questionIndex, setQuestionIndex] = useState(0);
     const [selected, setSelected] = useState<number | null>(null);
@@ -17,24 +21,41 @@ function LessonExercise() {
     const [correctCount, setCorrectCount] = useState(0);
     const [finished, setFinished] = useState(false);
 
+    // Chặn cộng thưởng 2 lần nếu component re-render sau khi finished=true
+    const rewardGiven = useRef(false);
+
     const meta = skill ? skillMeta[skill] : undefined;
     const lessons = skill ? skillLessons[skill] : undefined;
     const lesson = lessons?.find(l => l.id === lessonId);
     const question = mockExercise[questionIndex];
+
+    const earnedXp = correctCount * 10;
+    const earnedCoin = correctCount * 5;
+
+    // Cộng thưởng vào GameState CHỈ 1 lần khi vừa hoàn thành bài học.
+    // Đây là chỗ duy nhất "cộng tiền" — không tính lại công thức gì thêm,
+    // chỉ addCoins/addXp bằng số đã tính sẵn ở trên.
+    useEffect(() => {
+        if (finished && !rewardGiven.current) {
+            rewardGiven.current = true;
+            addCoins(earnedCoin);
+            addXp(earnedXp);
+        }
+    }, [finished, earnedCoin, earnedXp, addCoins, addXp]);
 
     if (!meta || !lesson || !question) {
         return (
             <div className={styles.wrap}>
                 <div className={styles.card}>
                     <p>Không tìm thấy bài học này.</p>
-                    <button className={styles.primaryBtn} onClick={() => navigate("/ear-training")}>← Về Cảm âm</button>
+                    <button className={styles.primaryBtn} onClick={() => navigate(basePath)}>← Quay lại</button>
                 </div>
             </div>
         );
     }
 
     function selectOption(i: number) {
-        if (state === "submitted") return; // đã submit thì không cho đổi đáp án nữa
+        if (state === "submitted") return;
         setSelected(i);
         setState("selected");
     }
@@ -59,10 +80,7 @@ function LessonExercise() {
 
     const progressPct = Math.round(((questionIndex + (state === "submitted" ? 1 : 0)) / mockExercise.length) * 100);
 
-    // ---- REWARD SCREEN (sau khi trả lời hết câu hỏi) ----
     if (finished) {
-        const earnedXp = correctCount * 10;
-        const earnedCoin = correctCount * 5;
         const nextLesson = lessons?.find(l => !l.locked && l.id !== lesson.id);
 
         return (
@@ -91,12 +109,12 @@ function LessonExercise() {
                         {nextLesson && (
                             <button
                                 className={styles.primaryBtn}
-                                onClick={() => navigate(`/ear-training/${skill}/lesson/${nextLesson.id}`)}
+                                onClick={() => navigate(`${basePath}/${skill}/lesson/${nextLesson.id}`)}
                             >
                                 Bài tiếp theo: {nextLesson.title} →
                             </button>
                         )}
-                        <button className={styles.secondaryBtn} onClick={() => navigate(`/ear-training/${skill}`)}>
+                        <button className={styles.secondaryBtn} onClick={() => navigate(`${basePath}/${skill}`)}>
                             Quay lại danh sách
                         </button>
                     </div>
@@ -105,11 +123,10 @@ function LessonExercise() {
         );
     }
 
-    // ---- QUESTION SCREEN ----
     return (
         <div className={styles.wrap}>
             <div className={styles.topRow}>
-                <span className={styles.exitBtn} onClick={() => navigate(`/ear-training/${skill}`)}>✕</span>
+                <span className={styles.exitBtn} onClick={() => navigate(`${basePath}/${skill}`)}>✕</span>
                 <div className={styles.progressTrack}>
                     <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
                 </div>

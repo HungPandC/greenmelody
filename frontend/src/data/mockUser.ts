@@ -1,37 +1,29 @@
-// Mock data tập trung — sau này thay bằng API thật (GetProfile() trong profileService.ts)
-// thì chỉ cần sửa 1 chỗ, không phải lục từng page.
-
+// Thông tin TĨNH của user (không đổi theo hành động trong app).
+// Số liệu ĐỘNG (coins, xp, gems, streak...) giờ nằm ở GameStateContext/useGameState,
+// vì những số đó cần cộng trừ real-time và hiển thị đồng bộ ở nhiều nơi (Topbar, Profile...).
 export const mockUser = {
     username: "Hưng",
+    email: "hung@example.com",
     avatarLetter: "H",
-    level: 12,
-    xp: 450,
-    coins: 450,
-    gems: 30,
-    lives: 3,
-    maxLives: 3,
-    streak: 5,
-    longestStreak: 12,
-    totalStudyTime: "4 giờ 32 phút",
-    lessonsCompleted: 28,
+    level: 1,
+    totalStudyTime: "0 phút",
+    lessonsCompleted: 0,
+    longestStreak: 0,
 };
 
 export const mockLeaderboard = [
     { rank: 1, name: "Minh Quân", xp: 1250, avatar: "M" },
     { rank: 2, name: "Khánh Linh", xp: 980, avatar: "K" },
     { rank: 3, name: "Tuấn Anh", xp: 870, avatar: "T" },
-    { rank: 4, name: "Hưng (Bạn)", xp: 250, avatar: "H", isMe: true },
+    { rank: 4, name: "Hưng (Bạn)", xp: 0, avatar: "H", isMe: true },
 ];
 
 export const mockAchievements = [
-    { icon: "⭐", label: "Chuỗi học dài nhất", value: "12 ngày" },
-    { icon: "🕐", label: "Tổng thời gian học", value: "4 giờ 32 phút" },
-    { icon: "📗", label: "Bài học đã hoàn thành", value: "28 bài" },
-    { icon: "🏆", label: "Thử thách đã hoàn thành", value: "9 thử thách" },
+    { icon: "⭐", label: "Chuỗi học dài nhất", value: "0 ngày" },
+    { icon: "🕐", label: "Tổng thời gian học", value: "0 phút" },
+    { icon: "📗", label: "Bài học đã hoàn thành", value: "0 bài" },
+    { icon: "🏆", label: "Thử thách đã hoàn thành", value: "0 thử thách" },
 ];
 
-export const mockHistory = [
-    { icon: "⭐", text: "Hoàn thành bài: Nhận biết quãng 4", xp: 20, time: "2 giờ trước" },
-    { icon: "🏆", text: "Hoàn thành thử thách: 3 bài học trong ngày", xp: 30, time: "5 giờ trước" },
-    { icon: "🎵", text: "Luyện tập bài: Twinkle Twinkle Little Star", xp: 15, time: "1 ngày trước" },
-];
+// Rỗng vì user mới chưa có hoạt động gì -> Profile page sẽ hiện empty state
+export const mockHistory: { icon: string; text: string; xp: number; time: string }[] = [];

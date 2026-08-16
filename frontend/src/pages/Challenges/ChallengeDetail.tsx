@@ -2,15 +2,17 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
+import SideRail from "../../components/layout/SideRail";
 import { dailyChallenges } from "../../data/mockChallenge";
+import useGameState from "../../hooks/useGameState";
 import styles from "./ChallengeDetail.module.css";
 
 function ChallengeDetail() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { addCoins, addXp } = useGameState();
     const challenge = dailyChallenges.find(c => c.id === id);
 
-    // claimed: đã bấm nhận thưởng chưa (chỉ có ý nghĩa khi progress = 100%)
     const [claimed, setClaimed] = useState(false);
 
     if (!challenge) {
@@ -28,6 +30,13 @@ function ChallengeDetail() {
     const percent = Math.round((challenge.current / challenge.total) * 100);
     const isComplete = challenge.current >= challenge.total;
     const checkpoints = [30, 70, 100];
+
+    function claimReward() {
+        // Cộng thẳng số đã định nghĩa sẵn ở mock data, không tính toán gì thêm
+        addCoins(challenge!.coin);
+        addXp(challenge!.xp);
+        setClaimed(true);
+    }
 
     return (
         <div className="layout">
@@ -62,7 +71,7 @@ function ChallengeDetail() {
                         claimed ? (
                             <div className={styles.claimedMsg}>🎉 Bạn đã nhận thưởng!</div>
                         ) : (
-                            <button className={styles.claimBtn} onClick={() => setClaimed(true)}>
+                            <button className={styles.claimBtn} onClick={claimReward}>
                                 Nhận thưởng
                             </button>
                         )
@@ -75,6 +84,7 @@ function ChallengeDetail() {
                     <button className={styles.backBtn} onClick={() => navigate("/challenges")}>← Quay lại danh sách</button>
                 </div>
             </main>
+            <SideRail />
         </div>
     );
 }

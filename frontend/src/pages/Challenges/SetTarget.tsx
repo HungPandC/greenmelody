@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
+import SideRail from "../../components/layout/SideRail";
 import useAuth from "../../hooks/useAuth";
 import { setDailyChallenge } from "../../services/dailyChallengeService";
 import { defaultTarget } from "../../data/mockChallenge";
@@ -79,6 +80,7 @@ function SetTarget() {
                     </button>
                 </div>
             </main>
+            <SideRail />
         </div>
     );
 }

@@ -17,9 +17,9 @@ export const defaultTarget: ChallengeTarget = {
 };
 
 export const mockProgress: ChallengeProgress = {
-    practiceTime: 8,
-    exercises: 2,
-    stars: 6,
+    practiceTime: 0,
+    exercises: 0,
+    stars: 0,
 };
 
 export const dailyChallenges = [
@@ -27,7 +27,7 @@ export const dailyChallenges = [
         id: "d1",
         icon: "🎯",
         title: "Hoàn thành 3 bài học",
-        current: 2,
+        current: 0,
         total: 3,
         xp: 20,
         coin: 30,
@@ -36,7 +36,7 @@ export const dailyChallenges = [
         id: "d2",
         icon: "🎤",
         title: "Đọc đúng 10 nốt ở khoá Sol",
-        current: 6,
+        current: 0,
         total: 10,
         xp: 20,
         coin: 30,

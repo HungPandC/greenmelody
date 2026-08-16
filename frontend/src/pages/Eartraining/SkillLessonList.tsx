@@ -2,6 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import styles from "./SkillLessonList.module.css";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
+import SideRail from "../../components/layout/SideRail";
 import { skillLessons, skillMeta } from "../../data/mockLessons";
 
 // Icon khuông nhạc đơn giản, tô màu theo prop.
@@ -17,16 +18,21 @@ const StaffArt = ({ color = "#2e9e5b", size = 60 }: { color?: string; size?: num
   </svg>
 );
 
-function SkillLessonList() {
-  // useParams đọc phần động của URL. Route khai báo "/ear-training/:skill"
-  // thì với URL "/ear-training/interval", useParams() trả về { skill: "interval" }.
+type Props = {
+  // Base URL của section chứa trang này. VD: "/ear-training" (Cảm âm),
+  // "/reading" (Đọc nhạc), "/practice" (Thực hành). Nhờ prop này mà cùng
+  // 1 component list bài học dùng được cho cả 3 mục, không cần viết lại.
+  basePath?: string;
+  backLabel?: string;
+};
+
+function SkillLessonList({ basePath = "/ear-training", backLabel = "Cảm âm" }: Props) {
   const { skill } = useParams<{ skill: string }>();
   const navigate = useNavigate();
 
   const lessons = skill ? skillLessons[skill] : undefined;
   const meta = skill ? skillMeta[skill] : undefined;
 
-  // Empty state: skill không tồn tại trong mock data
   if (!lessons || !meta) {
     return (
       <div className="layout">
@@ -35,7 +41,7 @@ function SkillLessonList() {
           <Topbar title="Không tìm thấy" />
           <div className={styles.emptyState}>
             <p>Kỹ năng này chưa có dữ liệu.</p>
-            <button className={styles.continueBtn} onClick={() => navigate("/ear-training")}>← Quay lại Cảm âm</button>
+            <button className={styles.continueBtn} onClick={() => navigate(basePath)}>← Quay lại {backLabel}</button>
           </div>
         </main>
       </div>
@@ -44,7 +50,6 @@ function SkillLessonList() {
 
   const doneCount = lessons.filter(l => l.completed).length;
   const totalCount = lessons.length;
-  const totalPct = totalCount ? Math.round((doneCount / totalCount) * 100) : 0;
   const nextLesson = lessons.find(l => l.current) ?? lessons.find(l => !l.locked);
 
   return (
@@ -55,8 +60,8 @@ function SkillLessonList() {
         <Topbar title={meta.title} />
 
         <div className={styles.breadcrumb}>
-          <span className={styles.back} onClick={() => navigate("/ear-training")}>←</span>
-          <a onClick={() => navigate("/ear-training")} style={{cursor:"pointer"}}>Cảm âm</a>
+          <span className={styles.back} onClick={() => navigate(basePath)}>←</span>
+          <a onClick={() => navigate(basePath)} style={{cursor:"pointer"}}>{backLabel}</a>
           <span className={styles.sep}>›</span>
           <span className={styles.current}>{meta.title}</span>
         </div>
@@ -80,7 +85,7 @@ function SkillLessonList() {
               <span className={styles.nextBadge}>BÀI TIẾP THEO</span>
               <div className={styles.nextTitle}>{nextLesson.title} · {nextLesson.sub}</div>
               <div className={styles.nextDesc}>Làm quen và luyện nghe qua các bài tập ngắn.</div>
-              <button className={styles.continueBtn} onClick={() => navigate(`/ear-training/${skill}/lesson/${nextLesson.id}`)}>
+              <button className={styles.continueBtn} onClick={() => navigate(`${basePath}/${skill}/lesson/${nextLesson.id}`)}>
                 Tiếp tục học ▶
               </button>
             </div>
@@ -112,7 +117,7 @@ function SkillLessonList() {
               ) : item.completed ? (
                 <div className={styles.doneRow}>✓ Hoàn thành</div>
               ) : (
-                <button className={styles.startBtn} onClick={() => navigate(`/ear-training/${skill}/lesson/${item.id}`)}>
+                <button className={styles.startBtn} onClick={() => navigate(`${basePath}/${skill}/lesson/${item.id}`)}>
                   Bắt đầu học →
                 </button>
               )}
@@ -122,6 +127,8 @@ function SkillLessonList() {
 
         <div className="hint">💡 Mẹo: Nghe kỹ và cảm nhận sự khác biệt giữa các âm nhé!</div>
       </main>
+
+      <SideRail />
     </div>
   );
 }

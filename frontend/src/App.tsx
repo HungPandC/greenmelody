@@ -15,6 +15,8 @@ import SkillLessonList from "./pages/Eartraining/SkillLessonList";
 import LessonExercise from "./pages/Eartraining/LessonExercise";
 import Journey from "./pages/Journey/Journey";
 import Practice from "./pages/Practice/Practice";
+import Reading from "./pages/Reading/Reading";
+import Garden from "./pages/Garden/Garden";
 import Profile from "./pages/Profile/Profile";
 import Settings from "./pages/Settings/Settings";
 import Challenges from "./pages/Challenges/Challenges";
@@ -44,7 +46,7 @@ function App() {
                 <Route element={<ProtectedRoute user={user} loading={loading} />}>
                     <Route path="/home" element={<Home />} />
                     <Route path="/journey" element={<Journey />} />
-                    <Route path="/practice" element={<Practice />} />
+                    <Route path="/garden" element={<Garden />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/settings" element={<Settings />} />
 
@@ -52,11 +54,22 @@ function App() {
                     <Route path="/challenges/set-target" element={<SetTarget />} />
                     <Route path="/challenges/:id" element={<ChallengeDetail />} />
 
+                    {/* Cảm âm */}
                     <Route path="/ear-training" element={<EarTraining />} />
-                    <Route path="/ear-training/:skill" element={<SkillLessonList />} />
-                    <Route path="/ear-training/:skill/lesson/:lessonId" element={<LessonExercise />} />
+                    <Route path="/ear-training/:skill" element={<SkillLessonList basePath="/ear-training" backLabel="Cảm âm" />} />
+                    <Route path="/ear-training/:skill/lesson/:lessonId" element={<LessonExercise basePath="/ear-training" />} />
 
-                    {/* giữ route cũ để không phá link nào đang trỏ tới /interval -> redirect sang route mới */}
+                    {/* Đọc nhạc - tách riêng khỏi Thực hành */}
+                    <Route path="/reading" element={<Reading />} />
+                    <Route path="/reading/:skill" element={<SkillLessonList basePath="/reading" backLabel="Đọc nhạc" />} />
+                    <Route path="/reading/:skill/lesson/:lessonId" element={<LessonExercise basePath="/reading" />} />
+
+                    {/* Thực hành */}
+                    <Route path="/practice" element={<Practice />} />
+                    <Route path="/practice/:skill" element={<SkillLessonList basePath="/practice" backLabel="Thực hành" />} />
+                    <Route path="/practice/:skill/lesson/:lessonId" element={<LessonExercise basePath="/practice" />} />
+
+                    {/* giữ route cũ để không phá link nào đang trỏ tới /interval */}
                     <Route path="/interval" element={<Navigate to="/ear-training/interval" replace />} />
                 </Route>
             </Routes>

@@ -1,25 +1,31 @@
 import jwt from "jsonwebtoken";
 
-export function createAccessToken(userId) {
-    return jwt.sign(
-        { userId },
-        process.env.JWT_SECRET_ACCESS,
-        { expiresIn: "20s" }
-    );
-}
-
-export function createRefreshToken(userId,sessionId) {
+export const createAccessToken = (userId) => {
     return jwt.sign(
         {
             userId,
-            sessionId
+            type: "access"
+        },
+        process.env.JWT_SECRET_ACCESS,
+        {
+            expiresIn: "20s"
+        }
+    );
+};
+
+export const createRefreshToken = (userId, sessionId) => {
+    return jwt.sign(
+        {
+            userId,
+            sessionId,
+            type: "refresh"
         },
         process.env.JWT_SECRET_REFRESH,
         {
-            expiresIn: "2m"
+            expiresIn: "3m"
         }
     );
-}
+};
 
 export function generateTokens(userId,sessionId) {
     const accessToken = createAccessToken(userId);

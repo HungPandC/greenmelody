@@ -59,6 +59,19 @@ export const skillLessons: Record<string, LessonItem[]> = {
         { id: "r1", title: "Nhịp 4/4 cơ bản", sub: "Đếm phách", locked: false, current: true },
         { id: "r2", title: "Đảo phách", sub: "Syncopation", locked: true },
     ],
+    // Đọc nhạc — tách riêng khỏi Thực hành theo yêu cầu, dùng chung engine bài học
+    "note-reading": [
+        { id: "nr1", title: "Đọc nốt khoá Sol", sub: "Đô - Rê - Mi - Fa - Sol", locked: false, current: true },
+        { id: "nr2", title: "Đọc nốt khoá Fa", sub: "Nốt trầm cơ bản", locked: true },
+    ],
+    "rhythm-reading": [
+        { id: "rr1", title: "Đọc tiết tấu cơ bản", sub: "Nốt đen - nốt trắng", locked: false, current: true },
+        { id: "rr2", title: "Đọc tiết tấu nâng cao", sub: "Nốt móc đơn - móc kép", locked: true },
+    ],
+    "symbol-recognition": [
+        { id: "sy1", title: "Ký hiệu cơ bản", sub: "Khoá Sol, khoá Fa, dấu lặng", locked: false, current: true },
+        { id: "sy2", title: "Ký hiệu nâng cao", sub: "Dấu luyến, dấu nhắc lại", locked: true },
+    ],
 };
 
 export const skillMeta: Record<string, { title: string; icon: string; desc: string }> = {
@@ -70,6 +83,9 @@ export const skillMeta: Record<string, { title: string; icon: string; desc: stri
     bassline: { title: "Bassline", icon: "🎸", desc: "Nhận biết và phân tích dòng bass." },
     piano: { title: "Piano", icon: "🎹", desc: "Luyện tập chơi piano trên màn hình ảo." },
     rhythm: { title: "Nhịp điệu", icon: "🥁", desc: "Luyện tập cảm nhận và giữ nhịp." },
+    "note-reading": { title: "Đọc nốt", icon: "🎼", desc: "Đọc tên và vị trí nốt nhạc trên khuông." },
+    "rhythm-reading": { title: "Đọc tiết tấu", icon: "🥁", desc: "Đọc và gõ đúng trường độ nốt nhạc." },
+    "symbol-recognition": { title: "Nhận biết ký hiệu", icon: "🔣", desc: "Nhận biết các ký hiệu âm nhạc thường gặp." },
 };
 
 // Câu hỏi mock dùng chung cho mọi lesson (prototype, chưa cần khác nhau theo bài)

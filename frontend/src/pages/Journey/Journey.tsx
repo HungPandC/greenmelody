@@ -2,12 +2,12 @@ import { useNavigate } from "react-router-dom";
 import styles from "./Journey.module.css";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
+import SideRail from "../../components/layout/SideRail";
 
 const stages = [
-    { icon: "👂", title: "Cảm âm", desc: "Nghe và nhận biết cao độ, quãng, hợp âm", percent: 45, done: 30, total: 67, path: "/ear-training", color: "var(--green)" },
-    { icon: "👁️", title: "Đọc nhạc", desc: "Đọc nốt, tiết tấu và bản nhạc", percent: 27, done: 12, total: 45, path: "/practice", color: "var(--blue)" },
-    { icon: "🎹", title: "Thực hành", desc: "Luyện tập và chơi nhạc trên màn hình", percent: 20, done: 8, total: 40, path: "/practice", color: "var(--orange)" },
-    { icon: "📖", title: "Cốt truyện", desc: "Học nhạc qua những câu chuyện thú vị", percent: 12, done: 2, total: 16, path: "/journey", color: "var(--purple)" },
+    { icon: "👂", title: "Cảm âm", desc: "Nghe và nhận biết cao độ, quãng, hợp âm", percent: 0, done: 0, total: 18, path: "/ear-training", color: "var(--green)" },
+    { icon: "👁️", title: "Đọc nhạc", desc: "Đọc nốt, tiết tấu và bản nhạc", percent: 0, done: 0, total: 6, path: "/reading", color: "var(--blue)" },
+    { icon: "🎹", title: "Thực hành", desc: "Luyện tập và chơi nhạc trên màn hình", percent: 0, done: 0, total: 4, path: "/practice", color: "var(--orange)" },
 ];
 
 function Journey() {
@@ -40,6 +40,7 @@ function Journey() {
                     ))}
                 </div>
             </main>
+            <SideRail />
         </div>
     );
 }

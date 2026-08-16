@@ -1,29 +1,29 @@
 import { useNavigate } from "react-router-dom";
-import styles from "./Practice.module.css";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
 import SideRail from "../../components/layout/SideRail";
 import { skillLessons, skillMeta } from "../../data/mockLessons";
+import styles from "./Reading.module.css";
 
-const practiceSlugs = ["piano", "rhythm"];
+const readingSlugs = ["note-reading", "rhythm-reading", "symbol-recognition"];
 
-function Practice() {
+function Reading() {
     const navigate = useNavigate();
 
     return (
         <div className="layout">
             <Sidebar />
             <main className="main">
-                <Topbar title="Thực hành" subtitle="Luyện tập và chơi nhạc trên màn hình" />
+                <Topbar title="Đọc nhạc" subtitle="Đọc nốt, tiết tấu và ký hiệu bản nhạc" />
 
                 <div className={styles.grid}>
-                    {practiceSlugs.map((slug) => {
+                    {readingSlugs.map((slug) => {
                         const meta = skillMeta[slug];
                         const lessons = skillLessons[slug];
                         const done = lessons.filter(l => l.completed).length;
                         const percent = Math.round((done / lessons.length) * 100);
                         return (
-                            <div className={styles.card} key={slug} onClick={() => navigate(`/practice/${slug}`)}>
+                            <div className={styles.card} key={slug} onClick={() => navigate(`/reading/${slug}`)}>
                                 <div className={styles.icon}>{meta.icon}</div>
                                 <h3>{meta.title}</h3>
                                 <p>{meta.desc}</p>
@@ -35,14 +35,10 @@ function Practice() {
                         );
                     })}
                 </div>
-
-                <div className="hint" style={{ marginTop: 24 }}>
-                    💡 Thêm nhiều bài luyện tập nhạc cụ sẽ được cập nhật sớm!
-                </div>
             </main>
             <SideRail />
         </div>
     );
 }
 
-export default Practice;
+export default Reading;

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
+import SideRail from "../../components/layout/SideRail";
 import { dailyChallenges } from "../../data/mockChallenge";
 import styles from "./Challenges.module.css";
 
@@ -36,6 +37,7 @@ function Challenges() {
                     <button className={styles.targetBtn} onClick={() => navigate("/challenges/set-target")}>Đặt mục tiêu →</button>
                 </div>
             </main>
+            <SideRail />
         </div>
     );
 }
