@@ -13,12 +13,29 @@ const AttemptSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
+        difficultyOctave: {
+            type: String,
+            enum: ["easy", "medium", "hardHight", "hardLow", "extreme"],
+        },
 
+        difficultyDistance: {
+            type: String,
+            enum: ["easy", "medium", "hard"],
+        },
         lessonId: {
             type: String,
             required: true,
         },
-
+        type: {
+            type: String,
+            required: true,
+            enum: [
+                "pitch-direction",
+                "pitch-compare",
+                "pitch-highestLowest",
+                "pitch-findDuplicate",
+            ],
+        },
         questions: [
             {
                 questionId: {
