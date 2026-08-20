@@ -1,6 +1,6 @@
-import User from "../models/User";
-import DailyChallenge from "../models/DailyChallenge";
-import { updateChallengeProgress,createDailyChallenge,rewardDailyChallenge } from "../services/rewardService";
+import User from "../models/user.model";
+import DailyChallenge from "../models/dailyChallenge.model";
+import { updateChallengeProgress,createDailyChallenge,rewardDailyChallenge } from "../services/reward.service";
 
 
 

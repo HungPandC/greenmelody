@@ -1,12 +1,12 @@
 import { randomInt } from "node:crypto";
-import User from "../models/User.js";
+import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
-import transporter from "../libs/mail.js";
-import PendingUser from "../models/PendingUser.js";
+import transporter from "../libs/mail.lib.js";
+import PendingUser from "../models/pendingUser.model.js";
 import { randomUUID } from "node:crypto";
 import jwt from "jsonwebtoken";
-import { generateTokens, setAuthCookies } from "../libs/auth.js";
-import PasswordSession from "../models/PasswordSession.js";
+import { generateTokens, setAuthCookies } from "../libs/auth.lib.js";
+import PasswordSession from "../models/passwordSession.model.js";
 
 export const register = async (req, res) => {
     try{

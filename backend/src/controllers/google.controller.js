@@ -1,7 +1,7 @@
 import { OAuth2Client } from "google-auth-library";
-import User from "../models/User.js";
-import { generateTokens,setAuthCookies } from "../libs/auth.js";
-import PasswordSession from "../models/PasswordSession.js";
+import User from "../models/user.model.js";
+import { generateTokens,setAuthCookies } from "../libs/auth.lib.js";
+import PasswordSession from "../models/passwordSession.model.js";
 import { randomUUID } from "node:crypto";
 import bcrypt from "bcrypt";
 

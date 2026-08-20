@@ -1,4 +1,4 @@
-import User from "../models/User";
+import User from "../models/user.model";
 
 export const updateStreak = async (userId)=> {
     const updateLongest = ()=>{

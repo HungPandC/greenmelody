@@ -1,6 +1,6 @@
 
-import { changeCurrency} from "./economyService";
-import { changeInventory } from "./inventoryService";
+import { changeCurrency} from "./economy.service";
+import { changeInventory } from "./inventory.service";
 const rewardScaleStart = {
     practiceTime: 30,
     exercises: 25,

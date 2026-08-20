@@ -1,11 +1,11 @@
 import { randomInt } from "node:crypto";
-import User from "../models/User.js";
+import User from "../models/user.model.js";
 import bcrypt from "bcrypt";
-import transporter from "../libs/mail.js";
-import PendingUser from "../models/PendingUser.js";
+import transporter from "../libs/mail.lib.js";
+import PendingUser from "../models/pendingUser.model.js";
 import { randomUUID } from "node:crypto";
-import PasswordReset from "../models/PasswordSession.js";
-import PasswordResetSession from "../models/PasswordResetSession.js";
+import PasswordReset from "../models/passwordSession.model.js";
+import PasswordResetSession from "../models/passwordResetSession.model.js";
 
 
 export const changePasswordController = async (req, res) => {

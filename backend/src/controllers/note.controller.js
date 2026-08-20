@@ -2,7 +2,7 @@ import path from "node:path";
 import fs from "node:fs";
 import MidiWriter from "midi-writer-js";
 import { renderMidi } from "../services/fluidSynth";
-import Attempt from "../models/Attempt";
+import Attempt from "../models/attempt.model";
 import {
     generateHighestLowestPitchQuestion,
     generatePitchDirectionQuestion

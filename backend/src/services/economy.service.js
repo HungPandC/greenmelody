@@ -1,6 +1,6 @@
-import CoinHistory from "../models/CoinHistory.js";
+import CoinHistory from "../models/coinHistory.model.js";
 import mongoose from "mongoose";
-import User from "../models/User.js";
+import User from "../models/user.model.js";
 
 
 // ================= VALIDATION =================

@@ -1,8 +1,8 @@
-import UserLesson from "../models/UserLesson";
+import UserLesson from "../models/userLesson.model";
 import {pitchLesson} from "../data/pitch";
-import Attempt from "../models/Attempt.js";
+import Attempt from "../models/attempt.model.js";
 import crypto from "crypto";
-import { createPitchAttempt } from "./createAttemptService.js";
+import { createPitchAttempt } from "./createAttempt.service.js";
 import { array } from "yargs";
 
 

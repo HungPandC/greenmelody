@@ -2,9 +2,9 @@ import jwt from "jsonwebtoken";
 import { body, validationResult } from "express-validator";
 import profanity from "allprofanity";
 import { verify } from 'node:crypto';
-import { createAccessToken,createRefreshToken,setAccessTokenCookie,setRefreshTokenCookie,setAuthCookies, } from "../libs/auth.js";
+import { createAccessToken,createRefreshToken,setAccessTokenCookie,setRefreshTokenCookie,setAuthCookies, } from "../libs/auth.lib.js";
 import bcrypt from "bcrypt";
-import PasswordSession from "../models/PasswordSession.js";
+import PasswordSession from "../models/passwordSession.model.js";
 import { randomUUID } from "node:crypto";
 
 const bannedWords = [

@@ -22,11 +22,11 @@ import {
     doubleCsrfProtection
 } from "../middlewares/csrf.js";
 
-import * as authController from "../controllers/authControllers.js";
-import * as userController from "../controllers/userControllers.js"
+import * as authController from "../controllers/auth.controller.js";
+import * as userController from "../controllers/user.controller.js"
 
-import User from "../models/User.js";
-import { loginGoogleController } from "../controllers/googleController.js";
+import User from "../models/user.model.js";
+import { loginGoogleController } from "../controllers/google.controller.js";
 
 const router = Router();
 
