@@ -48,29 +48,4 @@ export const playAttemptPitch = async (req,res)=>{
         attemptId,
         userId
     );
-    const type = attempt.type.replace("pitch-", "");;
-// export type PitchQuestionType = 
-//     | "direction"     // lên / xuống
-//     | "compare"       // cao hơn / thấp hơn / bằng
-//     | "highestLowest"       // cao nhất / thấp nhất
-//     | "findDuplicate"; // tìm 2 nốt giống nhau
-    switch (type) {
-        case "direction":
-            generatePitchDirectionQuestion()
-            break;
-
-        case "compare":
-            console.log("Nghe hướng lên/xuống");
-            break;
-
-        case "highestLowest":
-            console.log("Nghe khoảng cách");
-            break;
-
-        case "findDuplicate":
-            console.log("Nghe khoảng cách");
-            break;
-        default:
-            return res.status(401).json({message: "Can not find type of attempt"});
-    }
 }

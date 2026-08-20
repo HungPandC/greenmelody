@@ -8,6 +8,7 @@ export type PitchLesson = {
         title: string,
         skill: string,
         order: number,
+        questionCount: number, 
         BaseDifficultyOctave : "easy" | "medium" | "hardHight" | "hardLow" | "extreme",
         BaseDifficultyDistance : "easy" | "medium" | "hard",
         type: PitchQuestionType,

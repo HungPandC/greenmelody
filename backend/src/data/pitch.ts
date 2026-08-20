@@ -6,15 +6,18 @@ export const pitchLesson: PitchLesson[] = [
     title: "Nhận biết cao độ cơ bản",
     skill: "pitch",
     order: 1,
+    questionCount: 10,
     BaseDifficultyOctave : "easy",
     BaseDifficultyDistance : "easy",
     type: "direction",
+    
   },
   {
     id: "pitch-002",
     title: "Nhận biết cao độ nâng cao",
     skill: "pitch",
     order: 2,
+    questionCount: 10,
     BaseDifficultyOctave : "medium",
     BaseDifficultyDistance : "medium",
     type: "direction"

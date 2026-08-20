@@ -38,8 +38,8 @@ const AttemptSchema = new mongoose.Schema(
         },
         questions: [
             {
-                questionId: {
-                    type: String,
+                questionIndex: {
+                    type: Number,
                     required: true,
                 },
                 options: {
@@ -51,8 +51,8 @@ const AttemptSchema = new mongoose.Schema(
 
         answers: [
             {
-                questionId: {
-                    type: String,
+                answerIndex: {
+                    type: Number,
                     required: true,
                 },
 

@@ -1,4 +1,4 @@
-import type { OctaveType,typeDifficultyDistance,typeDifficultyOctave } from "./typeGenerators";
+import type { OctaveType,typeDifficultyDistance,typeDifficultyOctave } from "../../types/typeGenerators";
 
 
 const NOTES   = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
@@ -80,10 +80,11 @@ const OctaveNumber = {
 
 export const generatePitchDirectionQuestion = (
     octaveDifficulty: typeDifficultyOctave,
-    maxDistance: number,
+    difficultyDistance: typeDifficultyDistance,
     allowSame: boolean,
 ) => {
-    const octave : OctaveType = OctaveNumber[octaveDifficulty]
+    const maxDistance = distanceRange[difficultyDistance][1];
+    const octave : OctaveType = OctaveNumber[octaveDifficulty];
     const root = getRandomNoteInOctave(octave);
 
     const distance =
@@ -91,11 +92,23 @@ export const generatePitchDirectionQuestion = (
         (allowSame ? 0 : 1);
 
     const target = getNote(root, distance, octave);
-
-    return [
-        getNoteName(root),
-        getNoteName(target),
-    ];
+    // const answer,question
+    const difference = root - target;
+    let answer
+    if (difference < 0) {
+        answer = "up";
+    } else if (difference > 0) {
+        answer = "down";
+    } else {
+        answer = "equal";
+    }
+    return {
+        question : [
+            getNoteName(root),
+            getNoteName(root),
+        ],
+        answer,
+    };
 };
 
 const distanceRange = {
@@ -114,11 +127,9 @@ const questionNoteCount = {
 type QuestionType =
     | "nghelonhoacnhonhat"
     | "tim2notbangnhau";
-
-export const generateHighestLowestPitchQuestion = (
+const TaoNoteKhacNhau = (
     octaveDifficulty: typeDifficultyOctave,
-    difficulty: typeDifficultyDistance = "easy",
-    questionType: QuestionType = "nghelonhoacnhonhat",
+    difficultyDistance: typeDifficultyDistance ,
 ) => {
     const octave : OctaveType = OctaveNumber[octaveDifficulty]
     const minNote = octaveLocation[octave.minOctave];
@@ -126,7 +137,7 @@ export const generateHighestLowestPitchQuestion = (
 
     const root = getRandomNoteInOctave(octave);
 
-    const range = distanceRange[difficulty];
+    const range = distanceRange[difficultyDistance];
 
     const possibleNotes: number[] = [];
 
@@ -154,39 +165,58 @@ export const generateHighestLowestPitchQuestion = (
         remainingNotes[
             Math.floor(Math.random() * remainingNotes.length)
         ];
+    return [root,note1,note2]
+}
+export const generateHighestLowestPitchQuestion = (
+    octaveDifficulty: typeDifficultyOctave,
+    difficultyDistance: typeDifficultyDistance = "easy",
+) => {
+    const [root, note1, note2] = TaoNoteKhacNhau(
+        octaveDifficulty,
+        difficultyDistance
+    );
+    const max = Math.max(root, note1, note2); 
+    const min = Math.min(root, note1, note2); 
 
+    return {
+        question : [
+            getNoteName(root),
+            getNoteName(note1),
+            getNoteName(note2),
+        ],
+        answer : {max,min}
+    };
+};
+export const generateMatchingPitchesQuestion = (
+    octaveDifficulty: typeDifficultyOctave,
+    difficultyDistance: typeDifficultyDistance = "easy",
+) => {
+    const [root, note1, note2] = TaoNoteKhacNhau(
+        octaveDifficulty,
+        difficultyDistance
+    );
     let result = [
         getNoteName(root),
         getNoteName(note1),
         getNoteName(note2),
     ];
 
-    if (questionType === "tim2notbangnhau") {
-        const duplicateIndex =
-            Math.floor(Math.random() * 3);
-
-        const duplicateNote =
-            result[
-                Math.floor(Math.random() * 3)
-            ];
-
-        result.splice(
-            duplicateIndex,
-            0,
-            duplicateNote
-        );
+    const duplicateIndex =
+        Math.floor(Math.random() * 3);
+    const duplicateNote =
+        result[
+            Math.floor(Math.random() * 3)
+        ];
+    result.splice(
+        duplicateIndex,
+        0,
+        duplicateNote
+    );
+    const duplicate = result.find(
+        (note, index) => result.indexOf(note) !== index
+    );
+    return {
+        question : result,
+        answer : duplicate,
     }
-
-    return result;
-};
-
-
-
-
-
-// day ko phai chung voi 2 cai kia
-export const generateIntervalIdentificationQuestion = (
-    
-)=>{
-
 }
