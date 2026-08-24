@@ -51,7 +51,7 @@ const AttemptSchema = new mongoose.Schema(
 
         answers: [
             {
-                answerIndex: {
+                questionIndex: {
                     type: Number,
                     required: true,
                 },
@@ -62,10 +62,50 @@ const AttemptSchema = new mongoose.Schema(
                 },
             },
         ],
+        startAt: {
+            type: Date,
+            required: true,
+        },
 
-        completed: {
-            type: Boolean,
-            default: false,
+        endAt: {
+            type: Date,
+        },
+
+        lastMeaningfulActivityAt: {
+            type: Date,
+        },
+
+        lastHeartbeatAt: {
+            type: Date,
+        },
+
+        activeTime: {
+            type: Number,
+            default: 0, // milliseconds
+        },
+
+        currentTimeWindow: {
+            type: String,
+            enum: ["question", "review"],
+        },
+
+        currentWindowStartedAt: {
+            type: Date,
+        },
+        questionCount: {
+            type: Number,
+            min: 0,
+        },
+        remainingHp: {
+            type: Number,
+            default: 3,
+            min: 0,
+            max: 3,
+        },
+        status: {
+            type: String,
+            enum: ["in-progress", "completed", "abandoned", "expired","failed"],
+            default: "in-progress",
         },
     },
     {

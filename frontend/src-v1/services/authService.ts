@@ -67,7 +67,6 @@ export async function sendRegisterOtp(csrfToken: string) {
             "X-CSRF-Token": csrfToken,
         },
         body: JSON.stringify({
-            action: "sendotp",
         }),
     });
 }
@@ -86,7 +85,6 @@ export async function verifyRegisterOtp(
             "X-CSRF-Token": csrfToken,
         },
         body: JSON.stringify({
-            action: "verifyotp",
             otp,
         }),
     });

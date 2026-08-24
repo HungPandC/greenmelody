@@ -1,0 +1,88 @@
+import { BaseLesson } from '../../types/typeLesson';
+
+export const interval: BaseLesson[] = [
+    {
+        id: "interval-001",
+        title: "Nhận biết khoảng cách cơ bản",
+        skill: "interval",
+        order: 1,
+        questionCount: 10,
+    },
+    {
+        id: "interval-002",
+        title: "Nhận biết khoảng cách nâng cao",
+        skill: "interval",
+        order: 2,
+        questionCount: 10,
+    },
+    {
+        id: "interval-003",
+        title: "Phân biệt các quãng gần nhau",
+        skill: "interval",
+        order: 3,
+        questionCount: 10,
+    },
+    {
+        id: "interval-004",
+        title: "Nhận biết quãng trong phạm vi một quãng tám",
+        skill: "interval",
+        order: 4,
+        questionCount: 10,
+    },
+    {
+        id: "interval-005",
+        title: "Nhận biết quãng nâng cao",
+        skill: "interval",
+        order: 5,
+        questionCount: 10,
+    },
+    {
+        id: "interval-006",
+        title: "Phân biệt quãng lớn và nhỏ",
+        skill: "interval",
+        order: 6,
+        questionCount: 10,
+    },
+    {
+        id: "interval-007",
+        title: "Nhận biết quãng rộng",
+        skill: "interval",
+        order: 7,
+        questionCount: 10,
+    },
+    {
+        id: "interval-008",
+        title: "Nhận biết quãng phức tạp",
+        skill: "interval",
+        order: 8,
+        questionCount: 10,
+    },
+    {
+        id: "interval-009",
+        title: "Nhận biết quãng trong nhiều âm vực",
+        skill: "interval",
+        order: 9,
+        questionCount: 10,
+    },
+    {
+        id: "interval-010",
+        title: "Thử thách quãng nâng cao",
+        skill: "interval",
+        order: 10,
+        questionCount: 10,
+    },
+    {
+        id: "interval-011",
+        title: "Thử thách quãng rộng",
+        skill: "interval",
+        order: 11,
+        questionCount: 10,
+    },
+    {
+        id: "interval-012",
+        title: "Thử thách toàn bộ quãng",
+        skill: "interval",
+        order: 12,
+        questionCount: 10,
+    },
+];

@@ -3,25 +3,26 @@ import styles from "./Practice.module.css";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
 import SideRail from "../../components/layout/SideRail";
-import { skillLessons, skillMeta } from "../../data/mockLessons";
+import {skillMeta } from "../../data/mockLessons";
+import type { SkillId } from "../../../../shared/skills";
 
-const practiceSlugs = ["piano", "rhythm"];
+const practiceSlugs: SkillId[] = ["piano", "rhythm"];
 
 function Practice() {
     const navigate = useNavigate();
 
     return (
         <div className="layout">
-            <Sidebar />
+            {/* <Sidebar />
             <main className="main">
                 <Topbar title="Thực hành" subtitle="Luyện tập và chơi nhạc trên màn hình" />
 
                 <div className={styles.grid}>
                     {practiceSlugs.map((slug) => {
                         const meta = skillMeta[slug];
-                        const lessons = skillLessons[slug];
+                        const lessons = skillLessons[slug] ?? [];
                         const done = lessons.filter(l => l.completed).length;
-                        const percent = Math.round((done / lessons.length) * 100);
+                        const percent = lessons.length ? Math.round((done / lessons.length) * 100) : 0;
                         return (
                             <div className={styles.card} key={slug} onClick={() => navigate(`/practice/${slug}`)}>
                                 <div className={styles.icon}>{meta.icon}</div>
@@ -40,7 +41,7 @@ function Practice() {
                     💡 Thêm nhiều bài luyện tập nhạc cụ sẽ được cập nhật sớm!
                 </div>
             </main>
-            <SideRail />
+            <SideRail /> */}
         </div>
     );
 }

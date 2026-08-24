@@ -9,7 +9,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import GuestRoute from "./routes/GuestRoute";
 import useAuth from "./hooks/useAuth";
 import EarTraining from "./pages/Eartraining/Eartraining.tsx";
-import IntervalLesson from "./pages/Interval/IntervalLesson.tsx";
+import BaseLesson from "./pages/Interval/BaseLesson.tsx";
 function App() {
 
     const { user, loading } = useAuth()
@@ -30,7 +30,7 @@ function App() {
                 <Route element={<ProtectedRoute user={user} loading={loading} />}>
                     <Route path="/home" element={<Home />} />
                     <Route path="/ear-training" element={<EarTraining />} />
-                    <Route path="/interval" element={<IntervalLesson />} />
+                    <Route path="/interval" element={<BaseLesson />} />
                 </Route>
             </Routes>
         </BrowserRouter>

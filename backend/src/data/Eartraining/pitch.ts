@@ -1,0 +1,135 @@
+import { PitchLesson } from '../../types/typeLesson';
+
+export const pitch: PitchLesson[] = [
+    {
+        id: "pitch-001",
+        title: "Nhận biết cao độ cơ bản",
+        skill: "pitch",
+        order: 1,
+        questionCount: 10,
+        BaseDifficultyOctave: "easy",
+        BaseDifficultyDistance: "easy",
+        type: "direction",
+    },
+
+    {
+        id: "pitch-002",
+        title: "Nhận biết cao độ nâng cao",
+        skill: "pitch",
+        order: 2,
+        questionCount: 10,
+        BaseDifficultyOctave: "medium",
+        BaseDifficultyDistance: "medium",
+        type: "direction",
+    },
+
+    {
+        id: "pitch-003",
+        title: "Nhận biết khoảng cách cao độ",
+        skill: "pitch",
+        order: 3,
+        questionCount: 10,
+        BaseDifficultyOctave: "medium",
+        BaseDifficultyDistance: "hard",
+        type: "direction",
+    },
+
+    {
+        id: "pitch-004",
+        title: "So sánh hai cao độ",
+        skill: "pitch",
+        order: 4,
+        questionCount: 10,
+        BaseDifficultyOctave: "easy",
+        BaseDifficultyDistance: "easy",
+        type: "compare",
+    },
+
+    {
+        id: "pitch-005",
+        title: "So sánh cao độ nâng cao",
+        skill: "pitch",
+        order: 5,
+        questionCount: 10,
+        BaseDifficultyOctave: "medium",
+        BaseDifficultyDistance: "medium",
+        type: "compare",
+    },
+
+    {
+        id: "pitch-006",
+        title: "Tìm nốt cao nhất và thấp nhất",
+        skill: "pitch",
+        order: 6,
+        questionCount: 10,
+        BaseDifficultyOctave: "easy",
+        BaseDifficultyDistance: "easy",
+        type: "highestLowest",
+    },
+
+    {
+        id: "pitch-007",
+        title: "Tìm nốt cao nhất và thấp nhất nâng cao",
+        skill: "pitch",
+        order: 7,
+        questionCount: 10,
+        BaseDifficultyOctave: "medium",
+        BaseDifficultyDistance: "medium",
+        type: "highestLowest",
+    },
+
+    {
+        id: "pitch-008",
+        title: "Tìm hai nốt giống nhau",
+        skill: "pitch",
+        order: 8,
+        questionCount: 10,
+        BaseDifficultyOctave: "easy",
+        BaseDifficultyDistance: "easy",
+        type: "findDuplicate",
+    },
+
+    {
+        id: "pitch-009",
+        title: "Tìm hai nốt giống nhau nâng cao",
+        skill: "pitch",
+        order: 9,
+        questionCount: 10,
+        BaseDifficultyOctave: "medium",
+        BaseDifficultyDistance: "medium",
+        type: "findDuplicate",
+    },
+
+    {
+        id: "pitch-010",
+        title: "Cao độ ở âm vực cao",
+        skill: "pitch",
+        order: 10,
+        questionCount: 10,
+        BaseDifficultyOctave: "hardHight",
+        BaseDifficultyDistance: "hard",
+        type: "direction",
+    },
+
+    {
+        id: "pitch-011",
+        title: "Cao độ ở âm vực thấp",
+        skill: "pitch",
+        order: 11,
+        questionCount: 10,
+        BaseDifficultyOctave: "hardLow",
+        BaseDifficultyDistance: "hard",
+        type: "direction",
+    },
+
+    {
+        id: "pitch-012",
+        title: "Thử thách toàn bộ âm vực",
+        skill: "pitch",
+        order: 12,
+        questionCount: 10,
+        BaseDifficultyOctave: "extreme",
+        BaseDifficultyDistance: "hard",
+        type: "direction",
+    },
+];

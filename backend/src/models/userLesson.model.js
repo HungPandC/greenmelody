@@ -17,6 +17,14 @@ const userLessonSchema = new mongoose.Schema(
                         type: Boolean,
                         default: false,
                     },
+                    MocLonNhatDaNhan:{
+                        type : Number,
+                        enum: [50,70,80,90,100]
+                    },
+                    totalRewardCanClaim:{
+                        type: Number,
+                        min: 0
+                    }
                 },
                 { _id: false }
             ),

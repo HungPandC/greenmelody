@@ -3,7 +3,7 @@
    Các class dùng chung (sidebar, topbar, pill, sideCard, donut,
    streak, reward, todayGoal, hint...) ĐÃ có sẵn ở Home.module.css
    và EarTraining.module.css — không định nghĩa lại ở đây.
-   Xem comment trong IntervalLesson.tsx để biết class nào lấy từ đâu.
+   Xem comment trong BaseLesson.tsx để biết class nào lấy từ đâu.
    ========================================================= */
 
 /* ---------- Breadcrumb ---------- */

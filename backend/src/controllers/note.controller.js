@@ -43,7 +43,7 @@ export const playNote = async(req,res)=> {
 }
 export const playAttemptPitch = async (req,res)=>{
     const userId = req.body;
-    const { attemptId, questionId } = req.params;
+    const { attemptId, questionIndex } = req.params;
     const attempt = Attempt.findOne(
         attemptId,
         userId

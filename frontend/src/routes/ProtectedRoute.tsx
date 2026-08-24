@@ -6,7 +6,7 @@ function ProtectedRoute({ user, loading }: RouteProps) {
     console.log("ProtectedRoute user:", user);
     if (loading) return <div>Loading...</div>;
 
-    return user ? <Outlet /> : <Navigate to="/login" replace />;
+    return true ? <Outlet /> : <Navigate to="/login" replace />;// true thay bang user
 }
 
 export default ProtectedRoute;

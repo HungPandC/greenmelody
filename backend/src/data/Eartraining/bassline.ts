@@ -1,0 +1,88 @@
+import { BaseLesson } from '../../types/typeLesson';
+
+export const bassline: BaseLesson[] = [
+    {
+        id: "bassline-001",
+        title: "Nhận biết bass cơ bản",
+        skill: "bassline",
+        order: 1,
+        questionCount: 10,
+    },
+    {
+        id: "bassline-002",
+        title: "Nhận biết bass nâng cao",
+        skill: "bassline",
+        order: 2,
+        questionCount: 10,
+    },
+    {
+        id: "bassline-003",
+        title: "Ghi nhớ bass ngắn",
+        skill: "bassline",
+        order: 3,
+        questionCount: 10,
+    },
+    {
+        id: "bassline-004",
+        title: "Phân biệt các bassline",
+        skill: "bassline",
+        order: 4,
+        questionCount: 10,
+    },
+    {
+        id: "bassline-005",
+        title: "Nhận biết bassline dài hơn",
+        skill: "bassline",
+        order: 5,
+        questionCount: 10,
+    },
+    {
+        id: "bassline-006",
+        title: "Ghi nhớ bassline nâng cao",
+        skill: "bassline",
+        order: 6,
+        questionCount: 10,
+    },
+    {
+        id: "bassline-007",
+        title: "Phân biệt bassline gần giống nhau",
+        skill: "bassline",
+        order: 7,
+        questionCount: 10,
+    },
+    {
+        id: "bassline-008",
+        title: "Nhận biết bassline trong nhiều âm vực",
+        skill: "bassline",
+        order: 8,
+        questionCount: 10,
+    },
+    {
+        id: "bassline-009",
+        title: "Ghi nhớ bassline phức tạp",
+        skill: "bassline",
+        order: 9,
+        questionCount: 10,
+    },
+    {
+        id: "bassline-010",
+        title: "Thử thách bassline nâng cao",
+        skill: "bassline",
+        order: 10,
+        questionCount: 10,
+    },
+    {
+        id: "bassline-011",
+        title: "Thử thách ghi nhớ bassline",
+        skill: "bassline",
+        order: 11,
+        questionCount: 10,
+    },
+    {
+        id: "bassline-012",
+        title: "Thử thách toàn bộ bassline",
+        skill: "bassline",
+        order: 12,
+        questionCount: 10,
+    },
+];

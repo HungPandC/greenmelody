@@ -1,5 +1,1 @@
-export type dailyChallengeTargets = {
-    practiceTime: number;
-    exercises: number;
-    stars: number;
-}
+export type { DailyChallengeTargets as dailyChallengeTargets } from "../../../shared/dailyChallenge";

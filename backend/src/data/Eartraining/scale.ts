@@ -1,0 +1,88 @@
+import { BaseLesson } from '../../types/typeLesson';
+
+export const scale: BaseLesson[] = [
+    {
+        id: "scale-001",
+        title: "Nhận biết gam cơ bản",
+        skill: "scale",
+        order: 1,
+        questionCount: 10,
+    },
+    {
+        id: "scale-002",
+        title: "Nhận biết gam nâng cao",
+        skill: "scale",
+        order: 2,
+        questionCount: 10,
+    },
+    {
+        id: "scale-003",
+        title: "Phân biệt các gam cơ bản",
+        skill: "scale",
+        order: 3,
+        questionCount: 10,
+    },
+    {
+        id: "scale-004",
+        title: "Nhận biết gam trưởng",
+        skill: "scale",
+        order: 4,
+        questionCount: 10,
+    },
+    {
+        id: "scale-005",
+        title: "Nhận biết gam thứ",
+        skill: "scale",
+        order: 5,
+        questionCount: 10,
+    },
+    {
+        id: "scale-006",
+        title: "Phân biệt gam trưởng và thứ",
+        skill: "scale",
+        order: 6,
+        questionCount: 10,
+    },
+    {
+        id: "scale-007",
+        title: "Nhận biết gam trong nhiều âm vực",
+        skill: "scale",
+        order: 7,
+        questionCount: 10,
+    },
+    {
+        id: "scale-008",
+        title: "Nhận biết gam nâng cao",
+        skill: "scale",
+        order: 8,
+        questionCount: 10,
+    },
+    {
+        id: "scale-009",
+        title: "Phân biệt các gam gần nhau",
+        skill: "scale",
+        order: 9,
+        questionCount: 10,
+    },
+    {
+        id: "scale-010",
+        title: "Thử thách nhận biết gam",
+        skill: "scale",
+        order: 10,
+        questionCount: 10,
+    },
+    {
+        id: "scale-011",
+        title: "Thử thách gam nâng cao",
+        skill: "scale",
+        order: 11,
+        questionCount: 10,
+    },
+    {
+        id: "scale-012",
+        title: "Thử thách toàn bộ gam",
+        skill: "scale",
+        order: 12,
+        questionCount: 10,
+    },
+];

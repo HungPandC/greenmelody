@@ -1,4 +1,4 @@
-import styles from "./IntervalLesson.module.css";
+import styles from "./BaseLesson.module.css";
 // Các class dùng chung KHÔNG import ở đây (theo yêu cầu) — bạn tự nối vào
 // 1 file CSS chung (vd Shared.module.css) rồi đổi className bên dưới lại
 // thành shared.xxx khi gộp. Danh sách nguồn:
@@ -53,7 +53,7 @@ const doneCount = 36;
 const totalCount = 67;
 const totalPct = Math.round((doneCount / totalCount) * 100);
 
-function IntervalLesson(){
+function BaseLesson(){
   return (
     // className="layout" -> dùng lại .layout từ Home.module.css
     <div className="layout">
@@ -244,4 +244,4 @@ function IntervalLesson(){
   );
 };
 
-export default IntervalLesson;
+export default BaseLesson;

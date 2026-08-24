@@ -3,7 +3,9 @@ import styles from "./SkillLessonList.module.css";
 import Sidebar from "../../components/layout/Sidebar";
 import Topbar from "../../components/layout/Topbar";
 import SideRail from "../../components/layout/SideRail";
-import { skillLessons, skillMeta } from "../../data/mockLessons";
+import { skillMeta } from "../../data/mockLessons";
+import { useEffect, useState } from "react";
+import type { LessonItem } from "../../data/mockLessons";
 
 // Icon khuông nhạc đơn giản, tô màu theo prop.
 const StaffArt = ({ color = "#2e9e5b", size = 60 }: { color?: string; size?: number }) => (
@@ -29,11 +31,37 @@ type Props = {
 function SkillLessonList({ basePath = "/ear-training", backLabel = "Cảm âm" }: Props) {
   const { skill } = useParams<{ skill: string }>();
   const navigate = useNavigate();
+  const [lessons, setLessons] = useState<LessonItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+      if (!skill) return;
 
-  const lessons = skill ? skillLessons[skill] : undefined;
+      const loadLessons = async () => {
+          try {
+              setLoading(true);
+
+              const res = await fetch(
+                  `http://localhost:3000/lessons/${skill}`,
+                  {
+                      credentials: "include",
+                  }
+              );
+
+              const data = await res.json();
+
+              setLessons(data.lessons);
+          } finally {
+              setLoading(false);
+          }
+      };
+
+      loadLessons();
+  }, [skill]);
+  if (loading) return <div>Loading...</div>;
   const meta = skill ? skillMeta[skill] : undefined;
 
   if (!lessons || !meta) {
+    console.log(lessons,meta)
     return (
       <div className="layout">
         <Sidebar />

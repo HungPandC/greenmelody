@@ -1,0 +1,88 @@
+import { BaseLesson } from '../../types/typeLesson';
+
+export const chord: BaseLesson[] = [
+    {
+        id: "chord-001",
+        title: "Nhận biết hợp âm cơ bản",
+        skill: "chord",
+        order: 1,
+        questionCount: 10,
+    },
+    {
+        id: "chord-002",
+        title: "Nhận biết hợp âm nâng cao",
+        skill: "chord",
+        order: 2,
+        questionCount: 10,
+    },
+    {
+        id: "chord-003",
+        title: "Phân biệt các hợp âm cơ bản",
+        skill: "chord",
+        order: 3,
+        questionCount: 10,
+    },
+    {
+        id: "chord-004",
+        title: "Nhận biết hợp âm trưởng",
+        skill: "chord",
+        order: 4,
+        questionCount: 10,
+    },
+    {
+        id: "chord-005",
+        title: "Nhận biết hợp âm thứ",
+        skill: "chord",
+        order: 5,
+        questionCount: 10,
+    },
+    {
+        id: "chord-006",
+        title: "Phân biệt hợp âm trưởng và thứ",
+        skill: "chord",
+        order: 6,
+        questionCount: 10,
+    },
+    {
+        id: "chord-007",
+        title: "Nhận biết hợp âm trong nhiều âm vực",
+        skill: "chord",
+        order: 7,
+        questionCount: 10,
+    },
+    {
+        id: "chord-008",
+        title: "Nhận biết hợp âm đảo",
+        skill: "chord",
+        order: 8,
+        questionCount: 10,
+    },
+    {
+        id: "chord-009",
+        title: "Phân biệt hợp âm nâng cao",
+        skill: "chord",
+        order: 9,
+        questionCount: 10,
+    },
+    {
+        id: "chord-010",
+        title: "Thử thách nhận biết hợp âm",
+        skill: "chord",
+        order: 10,
+        questionCount: 10,
+    },
+    {
+        id: "chord-011",
+        title: "Thử thách hợp âm nâng cao",
+        skill: "chord",
+        order: 11,
+        questionCount: 10,
+    },
+    {
+        id: "chord-012",
+        title: "Thử thách toàn bộ hợp âm",
+        skill: "chord",
+        order: 12,
+        questionCount: 10,
+    },
+];

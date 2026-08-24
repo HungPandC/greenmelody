@@ -1,7 +1,25 @@
 node_modules/
+
 .env
+
 dist/
 build/
+
 *.zip
 
+# Audio / SoundFont
+*.sf2
+*.mp3
+*.wav
+*.ogg
+*.flac
 
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/

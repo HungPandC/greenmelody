@@ -1,0 +1,88 @@
+import { BaseLesson } from '../../types/typeLesson';
+
+export const melody: BaseLesson[] = [
+    {
+        id: "melody-001",
+        title: "Nhận biết giai điệu cơ bản",
+        skill: "melody",
+        order: 1,
+        questionCount: 10,
+    },
+    {
+        id: "melody-002",
+        title: "Nhận biết giai điệu nâng cao",
+        skill: "melody",
+        order: 2,
+        questionCount: 10,
+    },
+    {
+        id: "melody-003",
+        title: "Ghi nhớ giai điệu ngắn",
+        skill: "melody",
+        order: 3,
+        questionCount: 10,
+    },
+    {
+        id: "melody-004",
+        title: "Phân biệt các giai điệu",
+        skill: "melody",
+        order: 4,
+        questionCount: 10,
+    },
+    {
+        id: "melody-005",
+        title: "Nhận biết giai điệu dài hơn",
+        skill: "melody",
+        order: 5,
+        questionCount: 10,
+    },
+    {
+        id: "melody-006",
+        title: "Ghi nhớ giai điệu nâng cao",
+        skill: "melody",
+        order: 6,
+        questionCount: 10,
+    },
+    {
+        id: "melody-007",
+        title: "Phân biệt giai điệu gần giống nhau",
+        skill: "melody",
+        order: 7,
+        questionCount: 10,
+    },
+    {
+        id: "melody-008",
+        title: "Nhận biết giai điệu trong nhiều âm vực",
+        skill: "melody",
+        order: 8,
+        questionCount: 10,
+    },
+    {
+        id: "melody-009",
+        title: "Ghi nhớ giai điệu phức tạp",
+        skill: "melody",
+        order: 9,
+        questionCount: 10,
+    },
+    {
+        id: "melody-010",
+        title: "Thử thách giai điệu nâng cao",
+        skill: "melody",
+        order: 10,
+        questionCount: 10,
+    },
+    {
+        id: "melody-011",
+        title: "Thử thách ghi nhớ giai điệu",
+        skill: "melody",
+        order: 11,
+        questionCount: 10,
+    },
+    {
+        id: "melody-012",
+        title: "Thử thách toàn bộ giai điệu",
+        skill: "melody",
+        order: 12,
+        questionCount: 10,
+    },
+];

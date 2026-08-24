@@ -1,14 +1,7 @@
-export type ChallengeTarget = {
-    practiceTime: number; // phút
-    exercises: number;
-    stars: number;
-};
+import type { DailyChallengeTargets, DailyChallengeProgress } from "../../../shared/dailyChallenge";
 
-export type ChallengeProgress = {
-    practiceTime: number;
-    exercises: number;
-    stars: number;
-};
+export type ChallengeTarget = DailyChallengeTargets;
+export type ChallengeProgress = DailyChallengeProgress;
 
 export const defaultTarget: ChallengeTarget = {
     practiceTime: 15,

@@ -7,6 +7,6 @@ const router = Router();
 
 router.post("/play/note", playNote);
 router.post(
-    "/attempt/:attemptId/:questionId/play/pitch", 
+    "/attempt/:attemptId/:questionIndex/play/pitch", 
     playAttemptPitch
 );
