@@ -2,6 +2,8 @@
 import { error } from "node:console";
 import { changeCurrency} from "./economy.service";
 import { changeInventory } from "./inventory.service";
+import DailyChallenge from "../models/dailyChallenge.model";
+
 const rewardScaleStart = {
     practiceTime: 30,
     exercises: 25,
@@ -69,7 +71,7 @@ const commonRewards = {
         weight: 30,
         baseAmount: 1,
     },
-}
+};
 const ALLOWED_PRACTICE_TIMES = [5, 10, 15, 20, 30, 45, 60];
 const ALLOWED_EXERCISES = [3, 5, 10, 15, 25, 40, 60];
 const ALLOWED_STARS = [1, 2, 3, 5, 8, 12, 15];

@@ -7,6 +7,7 @@ export const scale: BaseLesson[] = [
         skill: "scale",
         order: 1,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "scale-002",
@@ -14,6 +15,7 @@ export const scale: BaseLesson[] = [
         skill: "scale",
         order: 2,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "scale-003",
@@ -21,6 +23,7 @@ export const scale: BaseLesson[] = [
         skill: "scale",
         order: 3,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "scale-004",
@@ -28,6 +31,7 @@ export const scale: BaseLesson[] = [
         skill: "scale",
         order: 4,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "scale-005",
@@ -35,6 +39,7 @@ export const scale: BaseLesson[] = [
         skill: "scale",
         order: 5,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "scale-006",
@@ -42,6 +47,7 @@ export const scale: BaseLesson[] = [
         skill: "scale",
         order: 6,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "scale-007",
@@ -49,6 +55,7 @@ export const scale: BaseLesson[] = [
         skill: "scale",
         order: 7,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "scale-008",
@@ -56,6 +63,7 @@ export const scale: BaseLesson[] = [
         skill: "scale",
         order: 8,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "scale-009",
@@ -63,6 +71,7 @@ export const scale: BaseLesson[] = [
         skill: "scale",
         order: 9,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "scale-010",
@@ -70,6 +79,7 @@ export const scale: BaseLesson[] = [
         skill: "scale",
         order: 10,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "scale-011",
@@ -77,6 +87,7 @@ export const scale: BaseLesson[] = [
         skill: "scale",
         order: 11,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "scale-012",
@@ -84,5 +95,6 @@ export const scale: BaseLesson[] = [
         skill: "scale",
         order: 12,
         questionCount: 10,
+        difficulty: "hard",
     },
 ];

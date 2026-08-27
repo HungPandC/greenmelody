@@ -7,6 +7,7 @@ export const interval: BaseLesson[] = [
         skill: "interval",
         order: 1,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "interval-002",
@@ -14,6 +15,7 @@ export const interval: BaseLesson[] = [
         skill: "interval",
         order: 2,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "interval-003",
@@ -21,6 +23,7 @@ export const interval: BaseLesson[] = [
         skill: "interval",
         order: 3,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "interval-004",
@@ -28,6 +31,7 @@ export const interval: BaseLesson[] = [
         skill: "interval",
         order: 4,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "interval-005",
@@ -35,6 +39,7 @@ export const interval: BaseLesson[] = [
         skill: "interval",
         order: 5,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "interval-006",
@@ -42,6 +47,7 @@ export const interval: BaseLesson[] = [
         skill: "interval",
         order: 6,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "interval-007",
@@ -49,6 +55,7 @@ export const interval: BaseLesson[] = [
         skill: "interval",
         order: 7,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "interval-008",
@@ -56,6 +63,7 @@ export const interval: BaseLesson[] = [
         skill: "interval",
         order: 8,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "interval-009",
@@ -63,6 +71,7 @@ export const interval: BaseLesson[] = [
         skill: "interval",
         order: 9,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "interval-010",
@@ -70,6 +79,7 @@ export const interval: BaseLesson[] = [
         skill: "interval",
         order: 10,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "interval-011",
@@ -77,6 +87,7 @@ export const interval: BaseLesson[] = [
         skill: "interval",
         order: 11,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "interval-012",
@@ -84,5 +95,6 @@ export const interval: BaseLesson[] = [
         skill: "interval",
         order: 12,
         questionCount: 10,
+        difficulty: "hard",
     },
 ];

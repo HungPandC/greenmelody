@@ -135,7 +135,7 @@ export const changeCurrency = async ({
 
 // ================= COIN =================
 
-export const addCoin = ({
+export const addCoin = async ({
     userId,
     amount,
     reason = "Add coin"
@@ -151,7 +151,7 @@ export const addCoin = ({
 };
 
 
-export const spendCoin = ({
+export const spendCoin = async ({
     userId,
     amount,
     reason = "Spend coin"
@@ -169,7 +169,7 @@ export const spendCoin = ({
 
 // ================= GEM =================
 
-export const addGem = ({
+export const addGem = async ({
     userId,
     amount,
     reason = "Add gem"
@@ -185,7 +185,7 @@ export const addGem = ({
 };
 
 
-export const spendGem = ({
+export const spendGem = async ({
     userId,
     amount,
     reason = "Spend gem"
@@ -199,8 +199,6 @@ export const spendGem = ({
         reason
     });
 };
-
-
 // ================= OTHER REWARDS =================
 
 // export const claimDailyReward = async ({

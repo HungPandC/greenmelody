@@ -7,6 +7,7 @@ export const melody: BaseLesson[] = [
         skill: "melody",
         order: 1,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "melody-002",
@@ -14,6 +15,7 @@ export const melody: BaseLesson[] = [
         skill: "melody",
         order: 2,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "melody-003",
@@ -21,6 +23,7 @@ export const melody: BaseLesson[] = [
         skill: "melody",
         order: 3,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "melody-004",
@@ -28,6 +31,7 @@ export const melody: BaseLesson[] = [
         skill: "melody",
         order: 4,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "melody-005",
@@ -35,6 +39,7 @@ export const melody: BaseLesson[] = [
         skill: "melody",
         order: 5,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "melody-006",
@@ -42,6 +47,7 @@ export const melody: BaseLesson[] = [
         skill: "melody",
         order: 6,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "melody-007",
@@ -49,6 +55,7 @@ export const melody: BaseLesson[] = [
         skill: "melody",
         order: 7,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "melody-008",
@@ -56,6 +63,7 @@ export const melody: BaseLesson[] = [
         skill: "melody",
         order: 8,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "melody-009",
@@ -63,6 +71,7 @@ export const melody: BaseLesson[] = [
         skill: "melody",
         order: 9,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "melody-010",
@@ -70,6 +79,7 @@ export const melody: BaseLesson[] = [
         skill: "melody",
         order: 10,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "melody-011",
@@ -77,6 +87,7 @@ export const melody: BaseLesson[] = [
         skill: "melody",
         order: 11,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "melody-012",
@@ -84,5 +95,6 @@ export const melody: BaseLesson[] = [
         skill: "melody",
         order: 12,
         questionCount: 10,
+        difficulty: "hard",
     },
 ];

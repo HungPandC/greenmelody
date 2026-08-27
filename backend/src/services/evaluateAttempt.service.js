@@ -3,7 +3,10 @@ import {pitch} from "../data/Eartraining/pitch.js";
 import Attempt from "../models/attempt.model.js";
 import crypto from "crypto";
 import { createPitchAttempt } from "./createAttempt.service.js";
-import { array } from "yargs";
+import {Allskill} from "../data/Allskill.ts";
+import { calculateMilestoneReward, calculateRewardAmount } from "./reward.service.js";
+import { addCoin } from "./economy.service.js";
+
 
 export const closeWindow = async (attempt, now) => {
     const HEARTBEAT_TIMEOUT = 30 * 1000;
@@ -41,6 +44,13 @@ export const closeWindow = async (attempt, now) => {
 
 
 export const startAttempt = async (userId,skill,lessonId) => {
+    const lesson = Allskill[skill].find(
+        lesson => lesson.id === lessonId
+    );
+    if (!lesson) {
+        throw new Error("Lesson not found");
+    }
+    const reward = calculateRewardAmount(lesson.totalCount,lesson.difficulty)
     const userLesson = await UserLesson.findOne({ userId });
     // tao va luu vao UserLesson
     if (!userLesson) {
@@ -49,24 +59,24 @@ export const startAttempt = async (userId,skill,lessonId) => {
             lesson: {
                 [lessonId]: {
                     completion: false,
+                    totalRewardCanClaim: reward.totalRewardCanClaim,
+                    reward : reward.milestoneRewards
                 },
+
             },
         });
     } else {
         if (!userLesson.lesson.has(lessonId)) {
             userLesson.lesson.set(lessonId, {
                 completion: false,
+                totalRewardCanClaim: reward.totalRewardCanClaim,
+                reward : reward.milestoneRewards
             });
 
             await userLesson.save();
         }
     }
-    const lesson = pitch.find(
-        lesson => lesson.id === lessonId
-    );
-    if (!lesson) {
-        throw new Error("Lesson not found");
-    }
+
     const attemptId = crypto.randomUUID();
 
     let questions = [];
@@ -110,15 +120,12 @@ export const startAttempt = async (userId,skill,lessonId) => {
 
         questionCount : lesson.questionCount,
 
-        remainingHp: 3,
-
         status: "in-progress",
 
     });
     return {
         attemptId: attempt.attemptId,
         questionCount: attempt.questionCount,
-        remainingHp: attempt.remainingHp,
         status: attempt.status,
     };
 };
@@ -145,11 +152,12 @@ export const submitAnswer = async (
     if (attempt.currentTimeWindow !== "question") {
         throw new Error("Not in question window");
     }
-
+    
     const now = new Date();
 
     // Đóng question window và tính activeTime
     await closeWindow(attempt, now);
+    await attempt.save()
 
     if (attempt.status !== "in-progress") {
         throw new Error("Attempt expired");
@@ -166,25 +174,8 @@ export const submitAnswer = async (
     const isCorrect =
         answerFromFrontend === answerData.answer;
 
-    // Sai → trừ HP
-    if (!isCorrect) {
-        attempt.remainingHp -= 1;
-
-        if (attempt.remainingHp <= 0) {
-            attempt.remainingHp = 0;
-            attempt.status = "failed";
-            attempt.completed = true;
-            attempt.endAt = now;
-
-            await attempt.save();
-
-            return {
-                questionIndex,
-                isCorrect,
-                remainingHp: attempt.remainingHp,
-                status: attempt.status,
-            };
-        }
+    if (isCorrect) {
+        attempt.totalRight ++;
     }
 
     // Nếu chưa phải câu cuối → chuyển sang review
@@ -196,17 +187,29 @@ export const submitAnswer = async (
 
     // Nếu là câu cuối → hoàn thành attempt
     if (questionIndex >= attempt.answers.length) {
-        attempt.status = "completed";
+        const userLesson = await UserLesson.findOne({ userId });
+        const lessonProgress = userLesson.lesson.get(attempt.lessonId);
+        const percent = Math.round((attempt.totalRight / attempt.questionCount) * 100);
+        const success = calculateMilestoneReward(percent,lessonProgress);
+        if(success.milestone){
+            await addCoin({
+                userId,
+                amount: success.coin,
+                reason: "hoan thanh reward"
+            });
+            lessonProgress.lastPrecent = percent;
+            lessonProgress.highestMilestoneReceived = success.milestone;
+            await userLesson.save();
+        }
+        attempt.status = "completed"
         attempt.completed = true;
         attempt.endAt = now;
     }
 
     await attempt.save();
-
     return {
         questionIndex,
         isCorrect,
-        remainingHp: attempt.remainingHp,
         status: attempt.status,
         currentTimeWindow: attempt.currentTimeWindow,
     };

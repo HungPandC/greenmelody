@@ -2,30 +2,12 @@ import mongoose from "mongoose";
 
 const AttemptSchema = new mongoose.Schema(
     {
-        attemptId: {
-            type: String,
-            required: true,
-            unique: true,
-        },
+        // Identifiers
+        attemptId: { type: String, required: true, unique: true },
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        lessonId: { type: String, required: true },
 
-        userId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-        },
-        difficultyOctave: {
-            type: String,
-            enum: ["easy", "medium", "hardHight", "hardLow", "extreme"],
-        },
-
-        difficultyDistance: {
-            type: String,
-            enum: ["easy", "medium", "hard"],
-        },
-        lessonId: {
-            type: String,
-            required: true,
-        },
+        // Loại bài & độ khó
         type: {
             type: String,
             required: true,
@@ -36,81 +18,60 @@ const AttemptSchema = new mongoose.Schema(
                 "pitch-findDuplicate",
             ],
         },
+        difficultyOctave: {
+            type: String,
+            enum: ["easy", "medium", "hardHight", "hardLow", "extreme"],
+        },
+        difficultyDistance: {
+            type: String,
+            enum: ["easy", "medium", "hard"],
+        },
+
+        // Nội dung câu hỏi & câu trả lời
         questions: [
             {
-                questionIndex: {
-                    type: Number,
-                    required: true,
-                },
-                options: {
-                    type: [String],
-                    default: [],
-                },
+                questionIndex: { type: Number, required: true },
+                options: { type: [String], default: [] },
             },
         ],
-
         answers: [
             {
-                questionIndex: {
-                    type: Number,
-                    required: true,
-                },
-
-                answer: {
-                    type: mongoose.Schema.Types.Mixed,
-                    required: true,
-                },
+                questionIndex: { type: Number, required: true },
+                answer: { type: mongoose.Schema.Types.Mixed, required: true },
             },
         ],
-        startAt: {
-            type: Date,
-            required: true,
-        },
+        questionCount: { type: Number, min: 0 },
 
-        endAt: {
-            type: Date,
-        },
+        // Thời gian làm bài
+        startAt: { type: Date, required: true },
+        endAt: { type: Date },
+        lastMeaningfulActivityAt: { type: Date },
+        lastHeartbeatAt: { type: Date },
+        activeTime: { type: Number, default: 0 }, // milliseconds
 
-        lastMeaningfulActivityAt: {
-            type: Date,
-        },
+        // Trạng thái phiên làm bài (window hiện tại)
+        currentTimeWindow: { type: String, enum: ["question", "review"] },
+        currentWindowStartedAt: { type: Date },
 
-        lastHeartbeatAt: {
-            type: Date,
-        },
-
-        activeTime: {
-            type: Number,
-            default: 0, // milliseconds
-        },
-
-        currentTimeWindow: {
-            type: String,
-            enum: ["question", "review"],
-        },
-
-        currentWindowStartedAt: {
-            type: Date,
-        },
-        questionCount: {
-            type: Number,
-            min: 0,
-        },
-        remainingHp: {
-            type: Number,
-            default: 3,
-            min: 0,
-            max: 3,
-        },
+        // Trạng thái tổng
         status: {
             type: String,
-            enum: ["in-progress", "completed", "abandoned", "expired","failed"],
+            enum: ["in-progress", "completed", "abandoned", "expired", "failed"],
             default: "in-progress",
         },
+        totalRight: {
+            type: Number,
+            min: 0,
+            default: 0,
+            validate: {
+                validator: function (value) {
+                    return value <= this.questionCount;
+                },
+                message: "totalRight không được lớn hơn questionCount",
+            },
+        },
     },
-    {
-        timestamps: true,
-    }
+    { timestamps: true }
 );
 
 export default mongoose.model("Attempt", AttemptSchema);

@@ -7,6 +7,7 @@ export const chord: BaseLesson[] = [
         skill: "chord",
         order: 1,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "chord-002",
@@ -14,6 +15,7 @@ export const chord: BaseLesson[] = [
         skill: "chord",
         order: 2,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "chord-003",
@@ -21,6 +23,7 @@ export const chord: BaseLesson[] = [
         skill: "chord",
         order: 3,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "chord-004",
@@ -28,6 +31,7 @@ export const chord: BaseLesson[] = [
         skill: "chord",
         order: 4,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "chord-005",
@@ -35,6 +39,7 @@ export const chord: BaseLesson[] = [
         skill: "chord",
         order: 5,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "chord-006",
@@ -42,6 +47,7 @@ export const chord: BaseLesson[] = [
         skill: "chord",
         order: 6,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "chord-007",
@@ -49,6 +55,7 @@ export const chord: BaseLesson[] = [
         skill: "chord",
         order: 7,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "chord-008",
@@ -56,6 +63,7 @@ export const chord: BaseLesson[] = [
         skill: "chord",
         order: 8,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "chord-009",
@@ -63,6 +71,7 @@ export const chord: BaseLesson[] = [
         skill: "chord",
         order: 9,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "chord-010",
@@ -70,6 +79,7 @@ export const chord: BaseLesson[] = [
         skill: "chord",
         order: 10,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "chord-011",
@@ -77,6 +87,7 @@ export const chord: BaseLesson[] = [
         skill: "chord",
         order: 11,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "chord-012",
@@ -84,5 +95,6 @@ export const chord: BaseLesson[] = [
         skill: "chord",
         order: 12,
         questionCount: 10,
+        difficulty: "hard",
     },
 ];

@@ -7,6 +7,7 @@ export const bassline: BaseLesson[] = [
         skill: "bassline",
         order: 1,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "bassline-002",
@@ -14,6 +15,7 @@ export const bassline: BaseLesson[] = [
         skill: "bassline",
         order: 2,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "bassline-003",
@@ -21,6 +23,7 @@ export const bassline: BaseLesson[] = [
         skill: "bassline",
         order: 3,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "bassline-004",
@@ -28,6 +31,7 @@ export const bassline: BaseLesson[] = [
         skill: "bassline",
         order: 4,
         questionCount: 10,
+        difficulty: "easy",
     },
     {
         id: "bassline-005",
@@ -35,6 +39,7 @@ export const bassline: BaseLesson[] = [
         skill: "bassline",
         order: 5,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "bassline-006",
@@ -42,6 +47,7 @@ export const bassline: BaseLesson[] = [
         skill: "bassline",
         order: 6,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "bassline-007",
@@ -49,6 +55,7 @@ export const bassline: BaseLesson[] = [
         skill: "bassline",
         order: 7,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "bassline-008",
@@ -56,6 +63,7 @@ export const bassline: BaseLesson[] = [
         skill: "bassline",
         order: 8,
         questionCount: 10,
+        difficulty: "medium",
     },
     {
         id: "bassline-009",
@@ -63,6 +71,7 @@ export const bassline: BaseLesson[] = [
         skill: "bassline",
         order: 9,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "bassline-010",
@@ -70,6 +79,7 @@ export const bassline: BaseLesson[] = [
         skill: "bassline",
         order: 10,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "bassline-011",
@@ -77,6 +87,7 @@ export const bassline: BaseLesson[] = [
         skill: "bassline",
         order: 11,
         questionCount: 10,
+        difficulty: "hard",
     },
     {
         id: "bassline-012",
@@ -84,5 +95,6 @@ export const bassline: BaseLesson[] = [
         skill: "bassline",
         order: 12,
         questionCount: 10,
+        difficulty: "hard",
     },
 ];

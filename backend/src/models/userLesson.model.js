@@ -17,13 +17,25 @@ const userLessonSchema = new mongoose.Schema(
                         type: Boolean,
                         default: false,
                     },
-                    MocLonNhatDaNhan:{
-                        type : Number,
-                        enum: [50,70,80,90,100]
+                    lastPercent: {
+                        type: Number,
+                        min: 0,
+                        max : 100,
                     },
-                    totalRewardCanClaim:{
+                    highestMilestoneReceived: {
+                        type: Number,
+                        enum: [50, 70, 80, 90, 100]
+                    },
+                    totalRewardCanClaim: {
                         type: Number,
                         min: 0
+                    },
+                    milestoneRewards: {
+                        50: Number,
+                        70: Number,
+                        80: Number,
+                        90: Number,
+                        100: Number,
                     }
                 },
                 { _id: false }
