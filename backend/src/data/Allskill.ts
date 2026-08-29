@@ -1,9 +1,9 @@
-import { bassline } from "./Eartraining/bassline";
-import { chord } from "./Eartraining/chord";
-import { pitch } from "./Eartraining/pitch";
-import { scale } from "./Eartraining/scale";
-import { melody } from "./Eartraining/melody";
-import { interval } from "./Eartraining/interval";
+import { bassline } from "./Eartraining/bassline.js";
+import { chord } from "./Eartraining/chord.js";
+import { pitch } from "./Eartraining/pitch.js";
+import { scale } from "./Eartraining/scale.js";
+import { melody } from "./Eartraining/melody.js";
+import { interval } from "./Eartraining/interval.js";
 
 export const Allskill = {
     pitch,

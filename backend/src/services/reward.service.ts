@@ -34,17 +34,21 @@ export const calculateRewardAmount = (
     difficulty
 ) => {
 
-    const lessonCountScale = findPassedThreshold(
-        lessonCountMultiplier,
-        totalLessons,
-        "count"
-    );
+    // FIX: nếu totalLessons nhỏ hơn mốc nhỏ nhất (10) thì findPassedThreshold
+    // trả về undefined -> crash khi đọc .multiplier. Fallback về multiplier thấp nhất.
+    const lessonCountScale =
+        findPassedThreshold(lessonCountMultiplier, totalLessons, "count")
+        ?? lessonCountMultiplier[0];
 
+    // FIX: validate difficulty, tránh NaN âm thầm khi difficulty không hợp lệ
     const difficultyScale = difficultyMultiplier[difficulty];
+    if (difficultyScale === undefined) {
+        throw new Error(`Invalid difficulty: ${difficulty}`);
+    }
 
     const milestoneRewards = Object.entries(rewardMilestones).reduce(
         (acc, [percent, rewardRatio]) => {
-            acc[percent] = 
+            acc[percent] =
                 baseRewardAmount *
                 lessonCountScale.multiplier *
                 difficultyScale *
@@ -64,12 +68,16 @@ export const calculateRewardAmount = (
     };
 };
 
-export const calculateMilestoneReward = (percent, userLesson) => {
-    const highestMilestoneReceived = userLesson.highestMilestoneReceived
-        ? Number(userLesson.highestMilestoneReceived)
+export const calculateMilestoneReward = (percent, lessonProgress) => {
+    const highestMilestoneReceived = lessonProgress.highestMilestoneReceived
+        ? Number(lessonProgress.highestMilestoneReceived)
         : null;
 
-    const milestone = Object.keys(userLesson.milestoneRewards)
+    // FIX: đọc đúng field "milestoneRewards" (trước đây bị lưu nhầm thành "reward"
+    // ở evaluateAttempt.service.js -> startAttempt, nên field này luôn undefined)
+    const milestoneRewards = lessonProgress.milestoneRewards ?? {};
+
+    const milestone = Object.keys(milestoneRewards)
         .map(Number)
         .sort((a, b) => a - b)
         .filter(m => percent >= m)
@@ -78,5 +86,5 @@ export const calculateMilestoneReward = (percent, userLesson) => {
     if (milestone === undefined) return null; // no milestone reached yet
     if (milestone === highestMilestoneReceived) return null; // already claimed this milestone
 
-    return { milestone, coin: userLesson.milestoneRewards[milestone] };
+    return { milestone, coin: milestoneRewards[milestone] };
 };

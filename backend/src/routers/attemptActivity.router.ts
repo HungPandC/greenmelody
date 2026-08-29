@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { authenticate } from "../middlewares/userValidation";
-import { updateHeartbeat,recordAttemptActivity } from "../controllers/attemptActivity.controller";
+import { authenticate } from "../middlewares/userValidation.js";
+import { updateHeartbeat,recordAttemptActivity } from "../controllers/attemptActivity.controller.js";
 
 
 const router = Router();
@@ -15,3 +15,4 @@ router.post(
     authenticate,
     recordAttemptActivity,
 )
+export default router;

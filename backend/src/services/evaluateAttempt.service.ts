@@ -1,9 +1,10 @@
 import UserLesson from "../models/userLesson.model.js";
-import {pitch} from "../data/Eartraining/pitch.js";
+import { pitch } from "../data/Eartraining/pitch.js";
 import Attempt from "../models/attempt.model.js";
 import crypto from "crypto";
+import mongoose from "mongoose";
 import { createPitchAttempt } from "./createAttempt.service.js";
-import {Allskill} from "../data/Allskill.ts";
+import { Allskill } from "../data/Allskill.ts";
 import { calculateMilestoneReward, calculateRewardAmount } from "./reward.service.js";
 import { addCoin } from "./economy.service.js";
 
@@ -43,14 +44,14 @@ export const closeWindow = async (attempt, now) => {
 };
 
 
-export const startAttempt = async (userId,skill,lessonId) => {
+export const startAttempt = async (userId, skill, lessonId) => {
     const lesson = Allskill[skill].find(
         lesson => lesson.id === lessonId
     );
     if (!lesson) {
         throw new Error("Lesson not found");
     }
-    const reward = calculateRewardAmount(lesson.totalCount,lesson.difficulty)
+    const reward = calculateRewardAmount(lesson.totalCount, lesson.difficulty);
     const userLesson = await UserLesson.findOne({ userId });
     // tao va luu vao UserLesson
     if (!userLesson) {
@@ -60,7 +61,10 @@ export const startAttempt = async (userId,skill,lessonId) => {
                 [lessonId]: {
                     completion: false,
                     totalRewardCanClaim: reward.totalRewardCanClaim,
-                    reward : reward.milestoneRewards
+                    // FIX: field đúng theo schema là "milestoneRewards", không phải "reward".
+                    // Với field "reward" cũ, Mongoose (strict mode) sẽ âm thầm loại bỏ nó khi
+                    // save, khiến milestoneRewards luôn undefined -> claim reward bị crash.
+                    milestoneRewards: reward.milestoneRewards
                 },
 
             },
@@ -70,7 +74,7 @@ export const startAttempt = async (userId,skill,lessonId) => {
             userLesson.lesson.set(lessonId, {
                 completion: false,
                 totalRewardCanClaim: reward.totalRewardCanClaim,
-                reward : reward.milestoneRewards
+                milestoneRewards: reward.milestoneRewards
             });
 
             await userLesson.save();
@@ -99,7 +103,7 @@ export const startAttempt = async (userId,skill,lessonId) => {
     const attempt = await Attempt.create({
         attemptId,
         userId,
-        
+
         difficultyOctave: lesson.BaseDifficultyOctave,
         difficultyDistance: lesson.BaseDifficultyDistance,
 
@@ -118,7 +122,7 @@ export const startAttempt = async (userId,skill,lessonId) => {
         currentTimeWindow: "question",
         currentWindowStartedAt: now,
 
-        questionCount : lesson.questionCount,
+        questionCount: lesson.questionCount,
 
         status: "in-progress",
 
@@ -152,12 +156,12 @@ export const submitAnswer = async (
     if (attempt.currentTimeWindow !== "question") {
         throw new Error("Not in question window");
     }
-    
+
     const now = new Date();
 
     // Đóng question window và tính activeTime
     await closeWindow(attempt, now);
-    await attempt.save()
+    await attempt.save();
 
     if (attempt.status !== "in-progress") {
         throw new Error("Attempt expired");
@@ -175,7 +179,7 @@ export const submitAnswer = async (
         answerFromFrontend === answerData.answer;
 
     if (isCorrect) {
-        attempt.totalRight ++;
+        attempt.totalRight++;
     }
 
     // Nếu chưa phải câu cuối → chuyển sang review
@@ -185,23 +189,59 @@ export const submitAnswer = async (
         attempt.lastMeaningfulActivityAt = now;
     }
 
+    // reward info trả về cho frontend (null nếu không nhận reward)
+    let rewardResult = null;
+
     // Nếu là câu cuối → hoàn thành attempt
     if (questionIndex >= attempt.answers.length) {
         const userLesson = await UserLesson.findOne({ userId });
         const lessonProgress = userLesson.lesson.get(attempt.lessonId);
         const percent = Math.round((attempt.totalRight / attempt.questionCount) * 100);
-        const success = calculateMilestoneReward(percent,lessonProgress);
-        if(success.milestone){
-            await addCoin({
-                userId,
-                amount: success.coin,
-                reason: "hoan thanh reward"
-            });
-            lessonProgress.lastPrecent = percent;
-            lessonProgress.highestMilestoneReceived = success.milestone;
-            await userLesson.save();
+
+        // FIX: calculateMilestoneReward có thể trả về null (chưa đạt mốc nào /
+        // đã claim mốc cao nhất rồi) -> phải check trước khi đọc .milestone,
+        // nếu không sẽ crash "Cannot read properties of null".
+        const success = calculateMilestoneReward(percent, lessonProgress);
+
+        if (success && success.milestone) {
+            // FIX: gộp addCoin + lưu userLesson vào cùng 1 transaction.
+            // Trước đây 2 thao tác này tách rời nhau -> nếu save userLesson lỗi
+            // sau khi coin đã cộng, user sẽ được cộng coin nhưng milestone không
+            // được đánh dấu đã claim, dẫn tới claim lại nhiều lần (double reward).
+            const session = await mongoose.startSession();
+            try {
+                session.startTransaction();
+
+                await addCoin({
+                    userId,
+                    amount: success.coin,
+                    reason: "hoan thanh reward",
+                    session
+                });
+
+                // FIX: field đúng là "lastPercent" (theo schema), bản cũ ghi nhầm
+                // thành "lastPrecent" nên field lastPercent không bao giờ được cập nhật.
+                lessonProgress.lastPercent = percent;
+                lessonProgress.highestMilestoneReceived = success.milestone;
+                userLesson.lesson.set(attempt.lessonId, lessonProgress);
+
+                await userLesson.save({ session });
+
+                await session.commitTransaction();
+            } catch (error) {
+                await session.abortTransaction();
+                throw error;
+            } finally {
+                await session.endSession();
+            }
+
+            rewardResult = {
+                milestone: success.milestone,
+                coin: success.coin
+            };
         }
-        attempt.status = "completed"
+
+        attempt.status = "completed";
         attempt.completed = true;
         attempt.endAt = now;
     }
@@ -212,5 +252,8 @@ export const submitAnswer = async (
         isCorrect,
         status: attempt.status,
         currentTimeWindow: attempt.currentTimeWindow,
+        // FIX: trước đây không trả reward về, frontend không biết vừa nhận
+        // bao nhiêu coin để hiện popup/animation khi hoàn thành bài.
+        reward: rewardResult,
     };
 };

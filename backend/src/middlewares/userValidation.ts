@@ -6,6 +6,7 @@ import { createAccessToken,createRefreshToken,setAccessTokenCookie,setRefreshTok
 import bcrypt from "bcrypt";
 import PasswordSession from "../models/passwordSession.model.js";
 import { randomUUID } from "node:crypto";
+import { RequestHandler } from "express";
 
 const bannedWords = [
     "admin",
@@ -167,7 +168,7 @@ export const resetPasswordValidation = [
     loginPasswordValidator(),
     passwordAgainValidator(),
 ]
-export const logout = (req, res) => {
+export const logout: RequestHandler = (req, res) => {
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
 
@@ -176,11 +177,11 @@ export const logout = (req, res) => {
     });
 };
 
-export function checkValidation(
+export const checkValidation : RequestHandler = (
     req,
     res,
     next
-) {
+) => {
     const result = validationResult(req);
 
     if (!result.isEmpty()) {
@@ -192,7 +193,7 @@ export function checkValidation(
     next();
 }
 
-export async function authenticate(req, res, next) {
+export const authenticate:RequestHandler = async (req, res, next) =>{
     const token = req.cookies.accessToken;
 
     if (!token) {
@@ -207,7 +208,7 @@ export async function authenticate(req, res, next) {
         // =========================
         const decoded = jwt.verify(
             token,
-            process.env.JWT_SECRET_ACCESS
+            process.env.JWT_SECRET_ACCESS as string
         );
         if (decoded.type !== "access") {
             return res.status(401).json({
@@ -235,7 +236,7 @@ export async function authenticate(req, res, next) {
                 // Verify refresh token
                 const decodedRefresh = jwt.verify(
                     refresh,
-                    process.env.JWT_SECRET_REFRESH
+                    process.env.JWT_SECRET_REFRESH as string
                 );
                 if (decodedRefresh.type !== "refresh") {
                     return res.status(401).json({

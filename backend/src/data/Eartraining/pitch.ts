@@ -1,4 +1,4 @@
-import { PitchLesson } from '../../types/typeLesson';
+import { PitchLesson } from '../../types/typeLesson.js';
 
 export const pitch: PitchLesson[] = [
     {

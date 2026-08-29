@@ -138,7 +138,8 @@ export const changeCurrency = async ({
 export const addCoin = async ({
     userId,
     amount,
-    reason = "Add coin"
+    reason = "Add coin",
+    session // FIX: cho phép truyền session để gộp chung transaction với caller
 }) => {
 
     return changeCurrency({
@@ -146,7 +147,8 @@ export const addCoin = async ({
         currency: "COIN",
         amount,
         type: "ADD",
-        reason
+        reason,
+        session
     });
 };
 
@@ -154,7 +156,8 @@ export const addCoin = async ({
 export const spendCoin = async ({
     userId,
     amount,
-    reason = "Spend coin"
+    reason = "Spend coin",
+    session
 }) => {
 
     return changeCurrency({
@@ -162,7 +165,8 @@ export const spendCoin = async ({
         currency: "COIN",
         amount,
         type: "SPEND",
-        reason
+        reason,
+        session
     });
 };
 
@@ -172,7 +176,8 @@ export const spendCoin = async ({
 export const addGem = async ({
     userId,
     amount,
-    reason = "Add gem"
+    reason = "Add gem",
+    session
 }) => {
 
     return changeCurrency({
@@ -180,7 +185,8 @@ export const addGem = async ({
         currency: "GEM",
         amount,
         type: "ADD",
-        reason
+        reason,
+        session
     });
 };
 
@@ -188,7 +194,8 @@ export const addGem = async ({
 export const spendGem = async ({
     userId,
     amount,
-    reason = "Spend gem"
+    reason = "Spend gem",
+    session
 }) => {
 
     return changeCurrency({
@@ -196,7 +203,8 @@ export const spendGem = async ({
         currency: "GEM",
         amount,
         type: "SPEND",
-        reason
+        reason,
+        session
     });
 };
 // ================= OTHER REWARDS =================

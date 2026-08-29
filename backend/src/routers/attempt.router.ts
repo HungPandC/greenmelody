@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { authenticate } from "../middlewares/userValidation";
-import { startAttemptController, submitAnswerController } from "../controllers/attempt.controller";
-import { getSkill } from "../controllers/getSkill.controller";
+import { authenticate } from "../middlewares/userValidation.js";
+import { startAttemptController, submitAnswerController } from "../controllers/attempt.controller.js";
+import { getSkill } from "../controllers/getSkill.controller.js";
 
 
 const router = Router();
@@ -21,3 +21,4 @@ router.get(
     authenticate,
     getSkill   
 )
+export default router;

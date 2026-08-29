@@ -1,4 +1,4 @@
-import { BaseLesson } from '../../types/typeLesson';
+import { BaseLesson } from '../../types/typeLesson.js';
 
 export const scale: BaseLesson[] = [
     {

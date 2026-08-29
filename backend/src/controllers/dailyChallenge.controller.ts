@@ -1,6 +1,6 @@
 import User from "../models/user.model";
 import DailyChallenge from "../models/dailyChallenge.model";
-import { claimReachedDailyRewards,createDailyChallenge,rewardDailyChallenge } from "../services/reward.service";
+import { claimReachedDailyRewards,createDailyChallenge,rewardDailyChallenge } from "../services/dailyChallenge.service";
 
 export const setNewDailyChallenge = async (req, res) => {
     try {
