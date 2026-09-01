@@ -1,8 +1,11 @@
-import User from "../models/user.model";
-import DailyChallenge from "../models/dailyChallenge.model";
-import { claimReachedDailyRewards,createDailyChallenge,rewardDailyChallenge } from "../services/dailyChallenge.service";
+import User from "../models/user.model.js";
+import DailyChallenge from "../models/dailyChallenge.model.js";
+import mongoose from "mongoose";
+import { claimReachedDailyRewards,createDailyChallenge,rewardDailyChallenge } from "../services/dailyChallenge.service.js";
+import { RequestHandler } from "express";
 
-export const setNewDailyChallenge = async (req, res) => {
+
+export const setNewDailyChallenge:RequestHandler = async (req, res) => {
     try {
         const challenge = await createDailyChallenge(
             req.user.userId,
@@ -20,27 +23,27 @@ export const setNewDailyChallenge = async (req, res) => {
         });
     }
 };
-export const updateDailyChallenge = async (req, res) => {
+export const updateDailyChallenge:RequestHandler = async (req, res) => {
     const userId = req.user.userId;
     const progress = req.body.progress;
-
+    const key = req.body.key;
     const session = await mongoose.startSession();
 
     try {
         session.startTransaction();
 
-        const challenge = await updateChallengeProgress(
+        const challenge = await claimReachedDailyRewards({
             userId,
             progress,
             session
-        );
+        },key);
 
-        const rewards = await rewardDailyChallenge(
+        const rewards = await rewardDailyChallenge({
             challenge,
             userId,
             progress,
             session
-        );
+        });
 
         await challenge.save({ session });
 

@@ -1,28 +1,50 @@
-import * as createQuestion from "./generators/Pitch.ts"
-export const createPitchAttempt = (lesson)=>{
-    const type = lesson.type;
-    // export type PitchQuestionType = 
-    //     | "direction"     // lên / xuống
-    //     | "compare"       // cao hơn / thấp hơn / bằng
-    //     | "highestLowest"       // cao nhất / thấp nhất
-    //     | "findDuplicate"; // tìm 2 nốt giống nhau
-    switch (type) {
+import * as createQuestion from "./generators/Pitch.js"
+import type { PitchLesson,Lesson } from "../types/typeLesson.js";
+export const createAttempt = (lesson: Lesson) => {
+
+    switch (lesson.skill) {
+
+        case "pitch":
+            return createPitchAttempt(lesson);
+
+        case "interval":
+            // return createIntervalAttempt(lesson);
+
+        case "melody":
+            // return createMelodyAttempt(lesson);
+
+        default:
+            throw new Error("Unsupported lesson");
+    }
+};
+export const createPitchAttempt = (lesson: PitchLesson) => {
+
+    switch (lesson.type) {
+
         case "direction":
-            return createQuestion.generatePitchDirectionQuestion(lesson.difficultyOctave ,lesson.difficultyDistance,false)
-            break;
+            return createQuestion.generatePitchDirectionQuestion(
+                lesson.BaseDifficultyOctave,
+                lesson.BaseDifficultyDistance,
+                false
+            );
 
         case "compare":
-            return createQuestion.generatePitchDirectionQuestion(lesson.difficultyOctave ,lesson.difficultyDistance,true)
-            break;
-            
+            return createQuestion.generatePitchDirectionQuestion(
+                lesson.BaseDifficultyOctave,
+                lesson.BaseDifficultyDistance,
+                true
+            );
+
         case "highestLowest":
-            return createQuestion.generateHighestLowestPitchQuestion(lesson.difficultyOctave ,lesson.difficultyDistance)
-            break;
+            return createQuestion.generateHighestLowestPitchQuestion(
+                lesson.BaseDifficultyOctave,
+                lesson.BaseDifficultyDistance
+            );
 
         case "findDuplicate":
-            return createQuestion.generateMatchingPitchesQuestion(lesson.difficultyOctave ,lesson.difficultyDistance)
-            break;
-        default:
-            throw new Error(`Invalid pitch question type: ${type}`);        
+            return createQuestion.generateMatchingPitchesQuestion(
+                lesson.BaseDifficultyOctave,
+                lesson.BaseDifficultyDistance
+            );
     }
-}
+};

@@ -1,6 +1,18 @@
 import mongoose from "mongoose";
-
-const userLessonSchema = new mongoose.Schema(
+interface userLesson {
+    userId : mongoose.Types.ObjectId,
+    lesson : {
+        completion: boolean,
+        lastPercent : number,
+        highestMilestoneReceived: number
+        totalRewardCanClaim : number,
+        milestoneRewards: {
+            50: number,
+            //...
+        }
+    }
+}
+const userLessonSchema = new mongoose.Schema<userLesson>(
     {
         userId: {
             type: mongoose.Schema.Types.ObjectId,

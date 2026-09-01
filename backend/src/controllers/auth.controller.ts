@@ -7,8 +7,10 @@ import { randomUUID } from "node:crypto";
 import jwt from "jsonwebtoken";
 import { generateTokens, setAuthCookies } from "../libs/auth.lib.js";
 import PasswordSession from "../models/passwordSession.model.js";
+import { RequestHandler } from "express";
 
-export const register = async (req, res) => {
+
+export const register:RequestHandler = async (req, res) => {
     try{
         const { username, email, password, password_again } = req.body;
 
@@ -73,7 +75,7 @@ export const register = async (req, res) => {
         });
     }
 };
-export const login = async (req, res) => {
+export const login:RequestHandler = async (req, res) => {
     const {email, password} = req.body;
     if(!email || !password){
         return res.status(400).json({message:"ko the thieu passsword,email"})
@@ -89,7 +91,7 @@ export const login = async (req, res) => {
 
     const isMatch = await bcrypt.compare(
         password,
-        user.hashedPassword
+        user.hashedPassword as string
     );
 
     if (!isMatch) {
@@ -103,7 +105,10 @@ export const login = async (req, res) => {
 
 
     const { accessToken, refreshToken } =
-        generateTokens(user._id, sessionId);
+        generateTokens({
+            userId:user._id.toString(), 
+            sessionId
+        });
     const refreshTokenHash = await bcrypt.hash(
         refreshToken,
         10
@@ -130,7 +135,7 @@ export const login = async (req, res) => {
         success: true
     });
 }
-export const sendRegisterOtp = async (req, res) => {
+export const sendRegisterOtp:RequestHandler = async (req, res) => {
     const sessionId = req.cookies.otp_session;
 
     const user = await PendingUser.findOne({
@@ -142,7 +147,7 @@ export const sendRegisterOtp = async (req, res) => {
             message: "Không tìm thấy người dùng"
         });
     }
-    if (user.expiredAt < new Date()) {
+    if (!user.expiredAt || user.expiredAt < new Date()) {
         return res.status(400).json({
             message: "Phiên đăng ký đã hết hạn"
         });
@@ -156,7 +161,9 @@ export const sendRegisterOtp = async (req, res) => {
     );
 
     await user.save();
-
+    if (!user.email) {
+        throw new Error("User email is missing");
+    }
     await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: user.email,
@@ -168,7 +175,7 @@ export const sendRegisterOtp = async (req, res) => {
         success: true
     });
 };
-export const verifyRegisterOTP = async (req, res) => {
+export const verifyRegisterOTP:RequestHandler = async (req, res) => {
     try {
         const { otp } = req.body;
         const sessionId = req.cookies.otp_session;
@@ -184,12 +191,11 @@ export const verifyRegisterOTP = async (req, res) => {
         });
 
         if (!data) {
-            return res.status(400).json({
+            return res.status(400). json({
                 message: "OTP đã hết hạn."
             });
         }
-
-        if (data.expiredAt < new Date()) {
+        if (!data.expiredAt || data.expiredAt < new Date()) {
             return res.status(400).json({
                 message: "Phiên đăng ký đã hết hạn."
             });
@@ -215,9 +221,13 @@ export const verifyRegisterOTP = async (req, res) => {
         if (!ok && ok) {
             return res.status(400).json({
                 message: "OTP sai."
+            });// dang test
+        }
+        if(!data.username){
+            return res.status(400).json({
+                message: "sai ten."
             });
         }
-
         // Tạo User
         const user = await User.create({
             username: data.username,
@@ -238,10 +248,10 @@ export const verifyRegisterOTP = async (req, res) => {
 
         // Tạo access + refresh token
         const { accessToken, refreshToken } =
-            generateTokens(
-                user._id,
-                authSessionId
-            );
+            generateTokens({
+                userId : user._id.toString(),
+                sessionId :authSessionId
+        });
         const refreshTokenHash = await bcrypt.hash(
             refreshToken,
             10

@@ -1,9 +1,11 @@
 import jwt from "jsonwebtoken";
 import { Response } from "express";
-type userSession = [
-    userId: string,
-    sessionId: string
-]
+type UserSession = {
+    userId: string;
+    sessionId: string;
+};
+
+
 export const createAccessToken = (userId : string) => {
     return jwt.sign(
         {
@@ -17,7 +19,10 @@ export const createAccessToken = (userId : string) => {
     );
 };
 
-export const createRefreshToken = ([userId, sessionId]: userSession) => {
+export const createRefreshToken = ({
+    userId,
+    sessionId
+}: UserSession) => {
     return jwt.sign(
         {
             userId,
@@ -31,16 +36,22 @@ export const createRefreshToken = ([userId, sessionId]: userSession) => {
     );
 };
 
-export function generateTokens([userId, sessionId]: userSession) {
+export function generateTokens({
+    userId,
+    sessionId
+}: UserSession) {
     const accessToken = createAccessToken(userId);
-    const refreshToken = createRefreshToken([userId,sessionId]);
+
+    const refreshToken = createRefreshToken({
+        userId,
+        sessionId
+    });
 
     return {
         accessToken,
-        refreshToken,
+        refreshToken
     };
 }
-
 
 export function setAccessTokenCookie(res: Response, accessToken: string) {
     res.cookie("accessToken", accessToken, {

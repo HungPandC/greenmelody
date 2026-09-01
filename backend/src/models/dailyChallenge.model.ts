@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
-import { boolean } from "yargs";
-
-const dailyChallengeSchema = mongoose.Schema({
+import { DailyChallengeModel } from "../types/typeDailyChallenge.js";
+const dailyChallengeSchema = new mongoose.Schema<DailyChallengeModel>({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -24,21 +23,21 @@ const dailyChallengeSchema = mongoose.Schema({
     rewards: {
         practiceTime: {
             canScale: Boolean,
-            checkpoint30: { type: String, amount: Number },
-            checkpoint70: { type: String, amount: Number },
-            completion: { type: String, amount: Number }
+            checkpoint30: { rewardType: String, amount: Number },
+            checkpoint70: { rewardType: String, amount: Number },
+            completion: { rewardType: String, amount: Number }
         },
         exercises: {
             canScale: Boolean,
-            checkpoint30: { type: String, amount: Number },
-            checkpoint70: { type: String, amount: Number },
-            completion: { type: String, amount: Number }
+            checkpoint30: { rewardType: String, amount: Number },
+            checkpoint70: { rewardType: String, amount: Number },
+            completion: { rewardType: String, amount: Number }
         },
         stars: {
             canScale: Boolean,
-            checkpoint30: { type: String, amount: Number },
-            checkpoint70: { type: String, amount: Number },
-            completion: { type: String, amount: Number }
+            checkpoint30: { rewardType: String, amount: Number },
+            checkpoint70: { rewardType: String, amount: Number },
+            completion: { rewardType: String, amount: Number }
         }
     },
 

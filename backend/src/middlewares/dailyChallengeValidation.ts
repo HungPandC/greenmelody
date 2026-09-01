@@ -1,6 +1,6 @@
-const allowedPracticeTimes = [5, 10, 15, 20, 30, 45, 60];
-const allowedExercises = [3, 5, 10, 15, 25, 40, 60];
-const allowedStars = [1, 2, 3, 5, 8, 12, 15];
+export const allowedPracticeTimes = [5, 10, 15, 20, 30, 45, 60] as const;
+export const allowedExercises = [3, 5, 10, 15, 25, 40, 60] as const;
+export const allowedStars = [1, 2, 3, 5, 8, 12, 15] as const;
 import { RequestHandler } from "express";
 export const validateDailyChallengeTargets:RequestHandler= (req,res,next)=>{
     const { practiceTime, exercises, stars } = req.body.targets;

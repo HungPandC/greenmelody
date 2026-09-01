@@ -1,6 +1,22 @@
 import mongoose from "mongoose";
-
-const UserSchema = new mongoose.Schema({
+interface User {
+    username: string;
+    hashedPassword?: string;
+    email: string;
+    displayName?: string;
+    phone?: string;
+    emailOTP?: string;
+    emailOTPExpires?: Date;
+    isVerified: boolean;
+    coin: number;
+    gem: number;
+    currentStreak: number;
+    lastStreakDate: Date | null;
+    longestStreak: number;
+    googleId: string | null;
+    avatar: string | null;
+}
+const UserSchema = new mongoose.Schema<User>({
     username:{
         type: String,
         required: true,

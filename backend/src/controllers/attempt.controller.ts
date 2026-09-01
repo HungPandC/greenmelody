@@ -1,9 +1,9 @@
 import { startAttempt, submitAnswer } from "../services/evaluateAttempt.service.js";
 import { closeWindow } from "../services/evaluateAttempt.service.js";
+import { RequestHandler } from "express";
 
 
-
-export const startAttemptController = async (req, res) => {
+export const startAttemptController:RequestHandler = async (req, res) => {
     try {
         const userId = req.user.userId;
         const { skill,lessonId } = req.params;
@@ -11,13 +11,19 @@ export const startAttemptController = async (req, res) => {
         const result = await startAttempt(userId,skill,lessonId);
 
         res.status(201).json(result);
-    } catch (error) {
-        res.status(500).json({
-            message: error.message,
+    }catch (error: unknown) {
+        if (error instanceof Error) {
+            return res.status(500).json({
+                message: error.message
+            });
+        }
+
+        return res.status(500).json({
+            message: "Unknown error"
         });
     }
 };
-export const submitAnswerController = async (req, res) => {
+export const submitAnswerController:RequestHandler = async (req, res) => {
     try {
         const userId = req.user.userId;
         const { attemptId, questionIndex } = req.params;
@@ -31,9 +37,15 @@ export const submitAnswerController = async (req, res) => {
         );
 
         res.status(200).json(result);
-    } catch (error) {
-        res.status(400).json({
-            message: error.message
+    }catch (error: unknown) {
+        if (error instanceof Error) {
+            return res.status(500).json({
+                message: error.message
+            });
+        }
+
+        return res.status(500).json({
+            message: "Unknown error"
         });
     }
 };

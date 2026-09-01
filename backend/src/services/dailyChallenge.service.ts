@@ -1,9 +1,23 @@
+import mongoose from "mongoose";
+import { changeCurrency} from "./economy.service.js";
+import { changeInventory } from "./inventory.service.js";
+import DailyChallenge from "../models/dailyChallenge.model.js";
+import {
+    receivedReward,
+    ClaimRewardContext,
+    DailyChallengeReward,
+    DailyChallengeTargetInput,
+    checkpoints,
+    keys,
+    Reward,
+    RandomReward,
+    RewardResult,
+    RewardKey,
+    ChallengeContextWithChallenge,
+    RewardAmount
+} from "../types/typeDailyChallenge.js";
 
-import { error } from "node:console";
-import { changeCurrency} from "./economy.service";
-import { changeInventory } from "./inventory.service";
-import DailyChallenge from "../models/dailyChallenge.model";
-
+import { allowedExercises,allowedStars,allowedPracticeTimes } from "../middlewares/dailyChallengeValidation.js";
 const rewardScaleStart = {
     practiceTime: 30,
     exercises: 25,
@@ -20,42 +34,7 @@ const checkpointRewards = {
     checkpoint70: 0.4,
     completion: 1
 };
-const practiceTimeTiers = {
-    5: 1,
-    10: 1,
-    15: 1,
-
-    20: 2,
-    30: 2,
-    45: 2,
-
-    60: 3
-};
-
-const exerciseTiers = {
-    3: 1,
-    5: 1,
-    10: 1,
-
-    15: 2,
-    25: 2,
-    40: 2,
-
-    60: 3
-};
-
-const starTiers = {
-    1: 1,
-    2: 1,
-    3: 1,
-
-    5: 2,
-    8: 2,
-    12: 2,
-
-    15: 3
-};
-const commonRewards = {
+const commonRewards: Record<string, RandomReward>  = {
     gem: {
         rewardType: "gem",
         weight: 30,
@@ -72,11 +51,45 @@ const commonRewards = {
         baseAmount: 1,
     },
 };
-const ALLOWED_PRACTICE_TIMES = [5, 10, 15, 20, 30, 45, 60];
-const ALLOWED_EXERCISES = [3, 5, 10, 15, 25, 40, 60];
-const ALLOWED_STARS = [1, 2, 3, 5, 8, 12, 15];
+type Tier = 1 | 2 | 3;
+const practiceTimeTiers: Record<typeof allowedPracticeTimes[number], Tier>= {
+    5: 1,
+    10: 1,
+    15: 1,
 
-const getRewardScale = (practiceTimeTarget, exercisesTarget, starsTarget) => {
+    20: 2,
+    30: 2,
+    45: 2,
+
+    60: 3
+};
+
+const exerciseTiers: Record<typeof allowedExercises[number], Tier> = {
+    3: 1,
+    5: 1,
+    10: 1,
+
+    15: 2,
+    25: 2,
+    40: 2,
+
+    60: 3
+};
+
+const starTiers: Record<typeof allowedStars[number], Tier> = {
+    1: 1,
+    2: 1,
+    3: 1,
+
+    5: 2,
+    8: 2,
+    12: 2,
+
+    15: 3
+};
+
+const factor = [0.3, 0.7, 1];
+const getRewardScale = ({practiceTimeTarget, exercisesTarget, starsTarget}: DailyChallengeTargetInput) => {
     // Challenge khó đến mức nào?
     const canScalePracticeTime =
         practiceTimeTarget >= rewardScaleStart.practiceTime;
@@ -97,9 +110,10 @@ const getRewardScale = (practiceTimeTarget, exercisesTarget, starsTarget) => {
 
     const dataArr = [practiceTimeTier,exercisesTier,starsTier];
     const dataCanScale = [canScalePracticeTime,canScaleExercises,canScaleStars];
-    const keys = ["practiceTime", "exercises", "stars"];
 
-    return dataArr.reduce((result, tier, index) => {
+    return dataArr.reduce<Record<RewardKey, Reward>>(
+    (result, tier, index) => {
+
         if (dataCanScale[index]) {
             result[keys[index]] = {
                 canScale: true,
@@ -115,9 +129,12 @@ const getRewardScale = (practiceTimeTarget, exercisesTarget, starsTarget) => {
         }
 
         return result;
-    }, {});
+
+        },
+        {} as Record<RewardKey, Reward>
+    );
 };
-export const getRandomReward = () => {
+export const getRandomReward = (): RandomReward | undefined => {
     const items = Object.values(commonRewards);
 
     const totalWeight = items.reduce(
@@ -134,31 +151,64 @@ export const getRandomReward = () => {
             return item;
         }
     }
+
+    return undefined;
 };
-export const calculateRewarDailyChallengeAmount = (practiceTime,exercises,stars)=>{
+export const calculateRewarDailyChallengeAmount = ({practiceTimeTarget, exercisesTarget, starsTarget}: DailyChallengeTargetInput)=>{
     //user nhận BAO NHIÊU?
-    const multiplier = getRewardScale(practiceTime,exercises,stars);
-    const checkpoints = ["checkpoint30", "checkpoint70", "completion"];
+    const multiplier = getRewardScale({
+        practiceTimeTarget: practiceTimeTarget,
+        exercisesTarget : exercisesTarget,
+        starsTarget : starsTarget
+    });
 
-    const createRewards = (key) => {
-        const canScale = multiplier[key].canScale;
+    const createRewards = (key: RewardKey): RewardResult => {
 
-        return checkpoints
-            .filter(checkpoint => canScale || checkpoint === "completion")
-            .reduce((result, checkpoint) => {
-                const rewards = getRandomReward();
+        const reward = multiplier[key];
 
-                result[checkpoint] = {
+        if (!reward.canScale) {
+
+            const rewards = getRandomReward();
+
+            if (!rewards) {
+                throw new Error("No reward available");
+            }
+
+            return {
+                canScale: false,
+                completion: {
                     rewardType: rewards.rewardType,
-                    amount: Math.floor(
-                        rewards.baseAmount * multiplier[key][checkpoint]
-                    )                
-                };
+                    amount: rewards.baseAmount
+                }
+            };
+        }
 
-                return result;
-            }, {
-                canScale
-            });
+        const result: Extract<RewardResult, { canScale: true }> = {
+            canScale: true,
+            checkpoint30: {} as RewardAmount,
+            checkpoint70: {} as RewardAmount,
+            completion: {} as RewardAmount
+        };
+
+        for (const checkpoint of checkpoints) {
+
+            const multiplierAmount = reward[checkpoint];
+
+            const rewards = getRandomReward();
+
+            if (!rewards) {
+                throw new Error("No reward available");
+            }
+
+            result[checkpoint] = {
+                rewardType: rewards.rewardType,
+                amount: Math.floor(
+                    rewards.baseAmount * multiplierAmount
+                )
+            };
+        }
+
+        return result;
     };
     const rewardPracticeTime = createRewards("practiceTime");
     const rewardExercises = createRewards("exercises");
@@ -171,24 +221,51 @@ export const calculateRewarDailyChallengeAmount = (practiceTime,exercises,stars)
     };
 }
 
-export const createDailyChallenge = async (userId, targets) => {
+export const createDailyChallenge = async (userId : mongoose.Types.ObjectId, targets:DailyChallengeTargetInput) => {
     const tomorrow = new Date();
 
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
     if (
-        !ALLOWED_PRACTICE_TIMES.includes(targets.practiceTime) ||
-        !ALLOWED_EXERCISES.includes(targets.exercises) ||
-        !ALLOWED_STARS.includes(targets.stars)
+        !allowedPracticeTimes.includes(targets.practiceTimeTarget) ||
+        !allowedExercises.includes(targets.exercisesTarget) ||
+        !allowedStars.includes(targets.starsTarget)
     ) {
         throw new Error("target nam o ngoai pham vi dc cho phep")
     }
-    const rewards = calculateRewarDailyChallengeAmount(
-        targets.practiceTime,
-        targets.exercises,
-        targets.stars
-    );
+    const rewards = calculateRewarDailyChallengeAmount({
+        practiceTimeTarget: targets.practiceTimeTarget,
+        exercisesTarget: targets.exercisesTarget,
+        starsTarget : targets.starsTarget
+    });
+    // const practiceTimeobject:RewardProgress  = {};
+    // if(rewards.rewardPracticeTime.canScale){
+    //     practiceTime.practiceTime = {
+    //         canScale: rewards.rewardPracticeTime.canScale,
+    //         checkpoint30: rewards.rewardPracticeTime.checkpoint30,
+    //         checkpoint70: rewards.rewardPracticeTime.checkpoint70,
+    //         completion: rewards.rewardPracticeTime.completion
+    //     }
+    // }else{
+    //     return{
+    //         canScale: rewards.rewardPracticeTime.canScale,
+    //         completion: rewards.rewardPracticeTime.completion
+    //     }
+    // }
 
+    const toDailyChallengeReward = (
+        reward: RewardResult
+    ): DailyChallengeReward => {
+
+        if (reward.canScale) {
+            return reward;
+        }
+
+        return {
+            canScale: false,
+            completion: reward.completion
+        };
+    };
     return await DailyChallenge.create({
         userId,
         date: tomorrow,
@@ -202,26 +279,9 @@ export const createDailyChallenge = async (userId, targets) => {
         },
 
         rewards: {
-            practiceTime: {
-                canScale: rewards.rewardPracticeTime.canScale,
-                checkpoint30: rewards.rewardPracticeTime.checkpoint30,
-                checkpoint70: rewards.rewardPracticeTime.checkpoint70,
-                completion: rewards.rewardPracticeTime.completion
-            },
-
-            exercises: {
-                canScale: rewards.rewardExercises.canScale,
-                checkpoint30: rewards.rewardExercises.checkpoint30,
-                checkpoint70: rewards.rewardExercises.checkpoint70,
-                completion: rewards.rewardExercises.completion
-            },
-
-            stars: {
-                canScale: rewards.rewardStars.canScale,
-                checkpoint30: rewards.rewardStars.checkpoint30,
-                checkpoint70: rewards.rewardStars.checkpoint70,
-                completion: rewards.rewardStars.completion
-            }
+            practiceTime: toDailyChallengeReward(rewards.rewardPracticeTime),
+            exercises: toDailyChallengeReward(rewards.rewardExercises),
+            stars: toDailyChallengeReward(rewards.rewardStars)
         },
 
         claimed: {
@@ -245,11 +305,11 @@ export const createDailyChallenge = async (userId, targets) => {
         }
     });
 };
-export const claimReachedDailyRewards = async (
+export const claimReachedDailyRewards = async ({
     userId,
     progress,
     session
-) => {
+}:ClaimRewardContext,key : RewardKey) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -264,34 +324,19 @@ export const claimReachedDailyRewards = async (
         throw new Error("Daily challenge not found");
     }
 
-    challenge.progress = progress;
+    challenge.progress[key] = progress;
 
     return challenge;
 };
-export const rewardDailyChallenge = async (
+export const rewardDailyChallenge = async ({
     challenge,
     userId,
     progress,
     session
-) => {
-    const factor = [0.3, 0.7, 1];
+}:ChallengeContextWithChallenge) => {
+    const receivedRewards:receivedReward[] = [];
 
-    const checkpoints = [
-        "checkpoint30",
-        "checkpoint70",
-        "completion"
-    ];
-
-    const keys = [
-        "practiceTime",
-        "exercises",
-        "stars"
-    ];
-
-    const receivedRewards = [];
-
-    for (let index = 0; index < keys.length; index++) {
-        const key = keys[index];
+    for (const key of keys) {
 
         const target = challenge.targets[key];
 
@@ -300,8 +345,9 @@ export const rewardDailyChallenge = async (
 
         const checkpointCount = canScale ? 3 : 1;
 
-        for (let i = 0; i < checkpointCount; i++) {
-            const checkpoint = checkpoints[i];
+        for (const [i, checkpoint] of checkpoints
+            .slice(0, checkpointCount)
+            .entries()){
 
             const requiredProgress =
                 Math.floor(target * factor[i]);

@@ -1,7 +1,8 @@
 import Attempt from "../models/attempt.model.js";
- // 30 giây
+import { closeWindow } from "../services/evaluateAttempt.service.js";
+import { RequestHandler } from "express";
 
-export const recordAttemptActivity = async (req, res) => {
+export const recordAttemptActivity:RequestHandler = async (req, res) => {
     try {
         const { attemptId,type } = req.params;
 
@@ -90,7 +91,7 @@ export const recordAttemptActivity = async (req, res) => {
     }
 };
 // Cập nhật heartbeat
-export const updateHeartbeat = async (req, res) => {
+export const updateHeartbeat:RequestHandler = async (req, res) => {
     try {
         const userId = req.user.userId;
         const { attemptId } = req.params;

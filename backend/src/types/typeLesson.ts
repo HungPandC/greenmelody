@@ -26,3 +26,5 @@ export type PitchLesson = BaseLesson & {
 
     type: PitchQuestionType,
 }
+export type Lesson =
+    | PitchLesson
