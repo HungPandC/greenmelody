@@ -1,6 +1,16 @@
 import mongoose from "mongoose";
 
-const pendingUserSchema = new mongoose.Schema({
+interface PendingUser {
+    sessionId: string;
+    username: string;
+    email: string;
+    hashedPassword: string;
+    hashedRegisterOTP?: string;
+    emailOTPExpires?: Date;
+    expiredAt: Date;
+}
+
+const pendingUserSchema = new mongoose.Schema<PendingUser>({
     sessionId: {
         type: String,
         required: true
@@ -29,4 +39,4 @@ const pendingUserSchema = new mongoose.Schema({
     }
 });
 
-export default mongoose.model("PendingUser", pendingUserSchema);
+export default mongoose.model<PendingUser>("PendingUser", pendingUserSchema);

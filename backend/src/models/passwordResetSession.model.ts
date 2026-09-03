@@ -1,6 +1,14 @@
 import mongoose from "mongoose";
 
-const passwordResetSchema = new mongoose.Schema({
+interface PasswordResetSession {
+    sessionId: string;
+    userId: mongoose.Types.ObjectId;
+    hashedResetOtp: string | null;
+    isVerified: boolean;
+    expiredAt: Date;
+}
+
+const passwordResetSchema = new mongoose.Schema<PasswordResetSession>({
     sessionId: {
         type: String,
         required: true,
@@ -29,7 +37,7 @@ const passwordResetSchema = new mongoose.Schema({
     },
 });
 
-export default mongoose.model(
+export default mongoose.model<PasswordResetSession>(
     "PasswordResetSession",
     passwordResetSchema
 );

@@ -1,6 +1,44 @@
 import mongoose from "mongoose";
 
-const AttemptSchema = new mongoose.Schema(
+interface AttemptQuestion {
+    questionIndex: number;
+    options: string[];
+}
+
+interface AttemptAnswer {
+    questionIndex: number;
+    answer: any;
+}
+
+export interface AttemptModel {
+    attemptId: string;
+    userId: mongoose.Types.ObjectId;
+    lessonId: string;
+
+    // type: "pitch-direction" | "pitch-compare" | "pitch-highestLowest" | "pitch-findDuplicate";
+    // difficultyOctave?: "easy" | "medium" | "hardHight" | "hardLow" | "extreme";
+    // difficultyDistance?: "easy" | "medium" | "hard";
+
+    questions: AttemptQuestion[];
+    answers: AttemptAnswer[];
+    questionCount: number;
+
+    startAt: Date;
+    endAt?: Date;
+    lastMeaningfulActivityAt?: Date;
+    lastHeartbeatAt?: Date;
+    activeTime: number; // milliseconds
+
+    currentTimeWindow?: "question" | "review";
+    currentWindowStartedAt?: Date;
+
+    status: "in-progress" | "completed" | "abandoned" | "expired" | "failed";
+    totalRight: number;
+
+    currentQuestionIndex: number;
+}
+
+const AttemptSchema = new mongoose.Schema<AttemptModel>(
     {
         // Identifiers
         attemptId: { type: String, required: true, unique: true },
@@ -8,24 +46,24 @@ const AttemptSchema = new mongoose.Schema(
         lessonId: { type: String, required: true },
 
         // Loại bài & độ khó
-        type: {
-            type: String,
-            required: true,
-            enum: [
-                "pitch-direction",
-                "pitch-compare",
-                "pitch-highestLowest",
-                "pitch-findDuplicate",
-            ],
-        },
-        difficultyOctave: {
-            type: String,
-            enum: ["easy", "medium", "hardHight", "hardLow", "extreme"],
-        },
-        difficultyDistance: {
-            type: String,
-            enum: ["easy", "medium", "hard"],
-        },
+        // type: {
+        //     type: String,
+        //     required: true,
+        //     enum: [
+        //         "pitch-direction",
+        //         "pitch-compare",
+        //         "pitch-highestLowest",
+        //         "pitch-findDuplicate",
+        //     ],
+        // },
+        // difficultyOctave: {
+        //     type: String,
+        //     enum: ["easy", "medium", "hardHight", "hardLow", "extreme"],
+        // },
+        // difficultyDistance: {
+        //     type: String,
+        //     enum: ["easy", "medium", "hard"],
+        // },
 
         // Nội dung câu hỏi & câu trả lời
         questions: [
@@ -64,14 +102,18 @@ const AttemptSchema = new mongoose.Schema(
             min: 0,
             default: 0,
             validate: {
-                validator: function (value) {
-                    return value <= this.questionCount;
+                validator: function (this: any, value: number) {
+                    return value <= (this.questionCount ?? Infinity);
                 },
                 message: "totalRight không được lớn hơn questionCount",
             },
+        },
+        currentQuestionIndex: {
+            type: Number,
+            default: 1
         },
     },
     { timestamps: true }
 );
 
-export default mongoose.model("Attempt", AttemptSchema);
+export default mongoose.model<AttemptModel>("Attempt", AttemptSchema);

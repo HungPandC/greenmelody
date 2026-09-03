@@ -372,15 +372,13 @@ export const rewardDailyChallenge = async ({
                 reward.amount;
 
             // ===== REWARD =====
-
+            const currency = rewardType.toUpperCase();
             if (
-                ["COIN", "GEM"].includes(
-                    rewardType.toUpperCase()
-                )
+                ["COIN", "GEM"].includes(currency)
             ) {
                 await changeCurrency({
                     userId,
-                    currency: rewardType.toUpperCase(),
+                    currency: currency as "COIN" | "GEM",
                     amount: rewardAmount,
                     type: "ADD",
                     reason: "DAILY_REWARD",

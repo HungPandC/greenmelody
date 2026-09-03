@@ -1,6 +1,14 @@
 import mongoose from "mongoose";
 
-const coinHistorySchema = new mongoose.Schema({
+interface CoinHistory {
+    userId: mongoose.Types.ObjectId;
+    amount: number;
+    type: "ADD" | "SPEND";
+    currency: "COIN" | "GEM";
+    reason: string;
+}
+
+const coinHistorySchema = new mongoose.Schema<CoinHistory>({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -35,4 +43,4 @@ const coinHistorySchema = new mongoose.Schema({
 });
 
 
-export default mongoose.model("CoinHistory", coinHistorySchema);
+export default mongoose.model<CoinHistory>("CoinHistory", coinHistorySchema);

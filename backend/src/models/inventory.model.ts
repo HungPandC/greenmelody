@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
-const inventorySchema = new mongoose.Schema(
+export interface InventoryDocument {
+    userId: mongoose.Types.ObjectId;
+    items: Map<string, number>;
+}
+
+const inventorySchema = new mongoose.Schema<InventoryDocument>(
     {
         userId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -23,6 +28,6 @@ const inventorySchema = new mongoose.Schema(
     }
 );
 
-const Inventory = mongoose.model("Inventory", inventorySchema);
+const InventoryModel = mongoose.model<InventoryDocument>("Inventory", inventorySchema);
 
-export default Inventory;
+export default InventoryModel;

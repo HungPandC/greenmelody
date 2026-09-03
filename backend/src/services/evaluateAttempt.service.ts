@@ -1,15 +1,14 @@
 import UserLesson from "../models/userLesson.model.js";
-import { pitch } from "../data/Eartraining/pitch.js";
-import Attempt from "../models/attempt.model.js";
+import Attempt,{ AttemptModel } from "../models/attempt.model.js";
 import crypto from "crypto";
 import mongoose from "mongoose";
-import { createPitchAttempt } from "./createAttempt.service.js";
-import { Allskill } from "../data/Allskill.ts";
+import { createAttempt } from "./createAttempt.service.js";
+import { Allskill } from "../data/Allskill.js";
 import { calculateMilestoneReward, calculateRewardAmount } from "./reward.service.js";
 import { addCoin } from "./economy.service.js";
+import { skillLesson } from '../types/typeLesson.js';
 
-
-export const closeWindow = async (attempt, now) => {
+export const closeWindow = async (attempt : AttemptModel, now : Date) => {
     const HEARTBEAT_TIMEOUT = 30 * 1000;
     if (!attempt.currentWindowStartedAt) {
         throw new Error("Current window has not started");
@@ -33,7 +32,7 @@ export const closeWindow = async (attempt, now) => {
 
     if (elapsed > 0) {
         attempt.activeTime += elapsed;
-    }
+    }   
 
     if (heartbeatExpired) {
         attempt.status = "abandoned";
@@ -44,14 +43,14 @@ export const closeWindow = async (attempt, now) => {
 };
 
 
-export const startAttempt = async (userId, skill, lessonId) => {
+export const startAttempt = async (userId : mongoose.Types.ObjectId, skill : skillLesson, lessonId: string) => {
     const lesson = Allskill[skill].find(
         lesson => lesson.id === lessonId
     );
     if (!lesson) {
         throw new Error("Lesson not found");
     }
-    const reward = calculateRewardAmount(lesson.totalCount, lesson.difficulty);
+    const reward = calculateRewardAmount(lesson.questionCount, lesson.difficulty);
     const userLesson = await UserLesson.findOne({ userId });
     // tao va luu vao UserLesson
     if (!userLesson) {
@@ -87,7 +86,7 @@ export const startAttempt = async (userId, skill, lessonId) => {
     let answers = [];
 
     for (let index = 0; index < lesson.questionCount; index++) {
-        const { question, answer } = createPitchAttempt(lesson);
+        const { question, answer } = createAttempt(lesson);
 
         questions.push({
             questionIndex: index + 1,
@@ -104,11 +103,8 @@ export const startAttempt = async (userId, skill, lessonId) => {
         attemptId,
         userId,
 
-        difficultyOctave: lesson.BaseDifficultyOctave,
-        difficultyDistance: lesson.BaseDifficultyDistance,
 
         lessonId: lesson.id,
-        type: lesson.type,
 
         questions,
         answers,
@@ -125,7 +121,7 @@ export const startAttempt = async (userId, skill, lessonId) => {
         questionCount: lesson.questionCount,
 
         status: "in-progress",
-
+        currentQuestionIndex: 1,
     });
     return {
         attemptId: attempt.attemptId,
@@ -135,10 +131,10 @@ export const startAttempt = async (userId, skill, lessonId) => {
 };
 
 export const submitAnswer = async (
-    userId,
-    attemptId,
-    questionIndex,
-    answerFromFrontend
+    userId: mongoose.Types.ObjectId,
+    attemptId: string,
+    questionIndex: number,
+    answerFromFrontend: string
 ) => {
     const attempt = await Attempt.findOne({
         userId,
@@ -157,18 +153,25 @@ export const submitAnswer = async (
         throw new Error("Not in question window");
     }
 
+    // Server tự kiểm tra user có đang trả lời đúng câu hiện tại không
+    if (questionIndex !== attempt.currentQuestionIndex) {
+        throw new Error("Invalid question index");
+    }
+
     const now = new Date();
 
     // Đóng question window và tính activeTime
     await closeWindow(attempt, now);
-    await attempt.save();
 
     if (attempt.status !== "in-progress") {
+        await attempt.save();
         throw new Error("Attempt expired");
     }
 
+    // Không tin questionIndex để tìm answer.
+    // Server dùng currentQuestionIndex của chính Attempt.
     const answerData = attempt.answers.find(
-        (a) => a.questionIndex === questionIndex
+        a => a.questionIndex === attempt.currentQuestionIndex
     );
 
     if (!answerData) {
@@ -182,78 +185,137 @@ export const submitAnswer = async (
         attempt.totalRight++;
     }
 
-    // Nếu chưa phải câu cuối → chuyển sang review
-    if (questionIndex < attempt.answers.length) {
+    const isLastQuestion =
+        attempt.currentQuestionIndex >= attempt.answers.length;
+
+    // Câu hiện tại đã được trả lời → chuyển sang câu tiếp theo
+    attempt.currentQuestionIndex++;
+
+    let rewardResult = null;
+
+    // =========================
+    // CHƯA PHẢI CÂU CUỐI
+    // =========================
+    if (!isLastQuestion) {
         attempt.currentTimeWindow = "review";
         attempt.currentWindowStartedAt = now;
         attempt.lastMeaningfulActivityAt = now;
+
+        await attempt.save();
+
+        return {
+            questionIndex,
+            isCorrect,
+            status: attempt.status,
+            currentTimeWindow: attempt.currentTimeWindow,
+            reward: null,
+        };
     }
 
-    // reward info trả về cho frontend (null nếu không nhận reward)
-    let rewardResult = null;
+    // =========================
+    // CÂU CUỐI → HOÀN THÀNH
+    // =========================
 
-    // Nếu là câu cuối → hoàn thành attempt
-    if (questionIndex >= attempt.answers.length) {
-        const userLesson = await UserLesson.findOne({ userId });
-        const lessonProgress = userLesson.lesson.get(attempt.lessonId);
-        const percent = Math.round((attempt.totalRight / attempt.questionCount) * 100);
+    const userLesson = await UserLesson.findOne({
+        userId,
+    });
 
-        // FIX: calculateMilestoneReward có thể trả về null (chưa đạt mốc nào /
-        // đã claim mốc cao nhất rồi) -> phải check trước khi đọc .milestone,
-        // nếu không sẽ crash "Cannot read properties of null".
-        const success = calculateMilestoneReward(percent, lessonProgress);
+    if (!userLesson) {
+        throw new Error("Can't find UserLesson");
+    }
 
-        if (success && success.milestone) {
-            // FIX: gộp addCoin + lưu userLesson vào cùng 1 transaction.
-            // Trước đây 2 thao tác này tách rời nhau -> nếu save userLesson lỗi
-            // sau khi coin đã cộng, user sẽ được cộng coin nhưng milestone không
-            // được đánh dấu đã claim, dẫn tới claim lại nhiều lần (double reward).
-            const session = await mongoose.startSession();
-            try {
-                session.startTransaction();
+    const lessonProgress = userLesson.lesson.get(
+        attempt.lessonId
+    );
 
-                await addCoin({
-                    userId,
-                    amount: success.coin,
-                    reason: "hoan thanh reward",
-                    session
-                });
+    if (!lessonProgress) {
+        throw new Error("Can't get lessonProgress");
+    }
 
-                // FIX: field đúng là "lastPercent" (theo schema), bản cũ ghi nhầm
-                // thành "lastPrecent" nên field lastPercent không bao giờ được cập nhật.
-                lessonProgress.lastPercent = percent;
-                lessonProgress.highestMilestoneReceived = success.milestone;
-                userLesson.lesson.set(attempt.lessonId, lessonProgress);
+    const percent = Math.round(
+        (attempt.totalRight / attempt.questionCount!) * 100
+    );
 
-                await userLesson.save({ session });
+    const success = calculateMilestoneReward(
+        percent,
+        lessonProgress
+    );
 
-                await session.commitTransaction();
-            } catch (error) {
-                await session.abortTransaction();
-                throw error;
-            } finally {
-                await session.endSession();
-            }
+    // =========================
+    // CÓ REWARD
+    // =========================
+
+    if (success) {
+        const session = await mongoose.startSession();
+
+        try {
+            await session.startTransaction();
+
+            // Cộng coin
+            await addCoin({
+                userId,
+                amount: success.coin,
+                reason: "hoan thanh reward",
+                session,
+            });
+
+            // Cập nhật lesson progress
+            lessonProgress.lastPercent = percent;
+            lessonProgress.highestMilestoneReceived =
+                success.milestone;
+
+            userLesson.lesson.set(
+                attempt.lessonId,
+                lessonProgress
+            );
+
+            await userLesson.save({
+                session,
+            });
+
+            // Hoàn thành attempt cũng nằm trong transaction
+            attempt.status = "completed";
+            attempt.endAt = now;
+
+            await attempt.save({
+                session,
+            });
+
+            // Tất cả thành công mới commit
+            await session.commitTransaction();
 
             rewardResult = {
                 milestone: success.milestone,
-                coin: success.coin
+                coin: success.coin,
             };
+
+        } catch (error) {
+            // Một trong các thao tác lỗi
+            // → rollback toàn bộ transaction
+            await session.abortTransaction();
+
+            throw error;
+
+        } finally {
+            await session.endSession();
         }
 
+    } else {
+        // =========================
+        // KHÔNG CÓ REWARD
+        // =========================
+
         attempt.status = "completed";
-        attempt.completed = true;
         attempt.endAt = now;
+
+        await attempt.save();
     }
 
-    await attempt.save();
     return {
         questionIndex,
         isCorrect,
         status: attempt.status,
         currentTimeWindow: attempt.currentTimeWindow,
-        // FIX: trước đây không trả reward về, frontend không biết vừa nhận
-        // bao nhiêu coin để hiện popup/animation khi hoàn thành bài.
         reward: rewardResult,
     };
 };

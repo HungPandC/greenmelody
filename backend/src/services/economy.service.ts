@@ -1,11 +1,11 @@
 import CoinHistory from "../models/coinHistory.model.js";
 import mongoose from "mongoose";
 import User from "../models/user.model.js";
-
-
+import { changeCurrencyType,currencyActionType } from "../types/typeEconomy.js";
+import { ClientSession } from "mongoose";
 // ================= VALIDATION =================
 
-const validateAmount = (amount) => {
+const validateAmount = (amount : number) => {
     if (!Number.isInteger(amount) || amount <= 0) {
         throw new Error("Invalid amount");
     }
@@ -18,16 +18,16 @@ export const changeCurrency = async ({
     amount,
     type,
     reason,
-    session: externalSession
-}) => {
+    session,
+}: changeCurrencyType) => {
 
     validateAmount(amount);
 
-    if (!["COIN", "GEM"].includes(currency)) {
+    if (!["COIN", "GEM"].includes(currency!)) {
         throw new Error("Invalid currency");
     }
 
-    if (!["ADD", "SPEND"].includes(type)) {
+    if (!["ADD", "SPEND"].includes(type!)) {
         throw new Error("Invalid transaction type");
     }
 
@@ -35,14 +35,14 @@ export const changeCurrency = async ({
         ? "coin"
         : "gem";
 
-    const session = externalSession ?? await mongoose.startSession();
+    const currentSession = session ?? await mongoose.startSession();
 
-    const isOwnSession = !externalSession;
+    const isOwnSession = !session;
 
     try {
 
         if (isOwnSession) {
-            session.startTransaction();
+            currentSession.startTransaction();
         }
 
         let updatedUser;
@@ -52,25 +52,31 @@ export const changeCurrency = async ({
         if (type === "SPEND") {
 
             updatedUser = await User.findOneAndUpdate(
+
                 {
                     _id: userId,
                     [field]: { $gte: amount }
                 },
+
                 {
                     $inc: {
                         [field]: -amount
                     }
                 },
+
                 {
                     new: true,
-                    session
+                    session: currentSession
                 }
+
             );
 
             if (!updatedUser) {
+
                 throw new Error(
-                    `Not enough ${currency.toLowerCase()}`
+                    `Not enough ${currency!.toLowerCase()}`
                 );
+
             }
 
         // ================= ADD =================
@@ -78,18 +84,22 @@ export const changeCurrency = async ({
         } else {
 
             updatedUser = await User.findOneAndUpdate(
+
                 {
                     _id: userId
                 },
+
                 {
                     $inc: {
                         [field]: amount
                     }
                 },
+
                 {
                     new: true,
-                    session
+                    session: currentSession
                 }
+
             );
 
             if (!updatedUser) {
@@ -107,11 +117,11 @@ export const changeCurrency = async ({
                 currency,
                 reason
             }],
-            { session }
+            { session: currentSession }
         );
 
         if (isOwnSession) {
-            await session.commitTransaction();
+            await currentSession.commitTransaction();
         }
 
         return updatedUser;
@@ -119,7 +129,7 @@ export const changeCurrency = async ({
     } catch (error) {
 
         if (isOwnSession) {
-            await session.abortTransaction();
+            await currentSession.abortTransaction();
         }
 
         throw error;
@@ -127,10 +137,11 @@ export const changeCurrency = async ({
     } finally {
 
         if (isOwnSession) {
-            await session.endSession();
+            await currentSession.endSession();
         }
     }
 };
+
 
 
 // ================= COIN =================
@@ -140,7 +151,7 @@ export const addCoin = async ({
     amount,
     reason = "Add coin",
     session // FIX: cho phép truyền session để gộp chung transaction với caller
-}) => {
+}: currencyActionType) => {
 
     return changeCurrency({
         userId,
@@ -158,7 +169,7 @@ export const spendCoin = async ({
     amount,
     reason = "Spend coin",
     session
-}) => {
+}: currencyActionType) => {
 
     return changeCurrency({
         userId,
@@ -178,7 +189,7 @@ export const addGem = async ({
     amount,
     reason = "Add gem",
     session
-}) => {
+}: currencyActionType) => {
 
     return changeCurrency({
         userId,
@@ -196,7 +207,7 @@ export const spendGem = async ({
     amount,
     reason = "Spend gem",
     session
-}) => {
+}: currencyActionType) => {
 
     return changeCurrency({
         userId,

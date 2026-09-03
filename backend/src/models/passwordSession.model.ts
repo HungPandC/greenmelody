@@ -1,6 +1,15 @@
 import mongoose from "mongoose";
 
-const passwordSchema = new mongoose.Schema({
+interface PasswordSession {
+    sessionId: string;
+    userId: mongoose.Types.ObjectId;
+    revoked: boolean;
+    refreshTokenHash?: string;
+    lastActivityAt: Date;
+    absoluteExpiresAt: Date;
+}
+
+const passwordSchema = new mongoose.Schema<PasswordSession>({
     sessionId: {
         type: String,
         required: true,
@@ -36,7 +45,7 @@ const passwordSchema = new mongoose.Schema({
     },
 });
 
-export default mongoose.model(
+export default mongoose.model<PasswordSession>(
     "PasswordSession",
     passwordSchema
 );

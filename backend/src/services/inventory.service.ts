@@ -1,19 +1,25 @@
-import Inventory from "../models/inventory.model.js";
-import mongoose from "mongoose";
+import Inventory,{InventoryDocument} from "../models/inventory.model.js";
+import mongoose, { ClientSession } from "mongoose";
 
-const validateAmount = (amount) => {
+const validateAmount = (amount:number) => {
     if (!Number.isInteger(amount) || amount <= 0) {
         throw new Error("Invalid amount");
     }
 };
-
+type changeInventoryType = {
+    userId: mongoose.Types.ObjectId,
+    itemId: string,
+    amount: number,
+    type: "ADD" | "USE",
+    session: ClientSession
+}
 export const changeInventory = async ({
     userId,
     itemId,
     amount,
     type,
-    session: externalSession
-}) => {
+    session,
+}: changeInventoryType): Promise<InventoryDocument> => {
 
     validateAmount(amount);
 
@@ -25,14 +31,14 @@ export const changeInventory = async ({
         throw new Error("Invalid inventory transaction type");
     }
 
-    const session = externalSession ?? await mongoose.startSession();
+    const currentSession = session ?? await mongoose.startSession();
 
-    const isOwnSession = !externalSession;
+    const isOwnSession = !session;
 
     try {
 
         if (isOwnSession) {
-            session.startTransaction();
+            currentSession.startTransaction();
         }
 
         let updatedInventory;
@@ -55,7 +61,7 @@ export const changeInventory = async ({
                 },
                 {
                     new: true,
-                    session
+                    session: currentSession
                 }
             );
 
@@ -78,7 +84,7 @@ export const changeInventory = async ({
                         }
                     },
                     {
-                        session
+                        session: currentSession
                     }
                 );
 
@@ -101,7 +107,7 @@ export const changeInventory = async ({
                 {
                     new: true,
                     upsert: true,
-                    session
+                    session: currentSession
                 }
             );
 
@@ -111,7 +117,7 @@ export const changeInventory = async ({
         }
 
         if (isOwnSession) {
-            await session.commitTransaction();
+            await currentSession.commitTransaction();
         }
 
         return updatedInventory;
@@ -119,7 +125,7 @@ export const changeInventory = async ({
     } catch (error) {
 
         if (isOwnSession) {
-            await session.abortTransaction();
+            await currentSession.abortTransaction();
         }
 
         throw error;
@@ -127,7 +133,7 @@ export const changeInventory = async ({
     } finally {
 
         if (isOwnSession) {
-            await session.endSession();
+            await currentSession.endSession();
         }
     }
 };

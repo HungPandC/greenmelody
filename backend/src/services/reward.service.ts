@@ -1,5 +1,4 @@
-import { addCoin } from "./economy.service";
-
+import { UserLessonProgress,Milestone } from "../types/typeUserLesson.js";
 const difficultyMultiplier = {
     easy: 1,
     medium: 1.5,
@@ -12,8 +11,7 @@ const rewardMilestones = {
     "80": 0.70,
     "90": 0.85,
     "100": 1
-};
-
+} as const ;
 const baseRewardAmount = 100; // coin
 
 const lessonCountMultiplier = [
@@ -22,16 +20,22 @@ const lessonCountMultiplier = [
     { count: 30, multiplier: 1.8 },
     { count: 40, multiplier: 2.1 },
     { count: 50, multiplier: 2.3 },
-];
-
-const findPassedThreshold = (arr, target, key) =>
+] as const;
+const findPassedThreshold = <
+        T extends Record<K, number>,
+        K extends keyof T
+    >(
+        arr: readonly T[],
+        target: number,
+        key: K
+    ) =>
     [...arr]
         .sort((a, b) => b[key] - a[key]) // sắp xếp giảm dần
         .find(item => target >= item[key]); // lấy mốc lớn nhất mà target vượt qua
 
 export const calculateRewardAmount = (
-    totalLessons,
-    difficulty
+    totalLessons : number,
+    difficulty: "easy" | "medium" | "hard"
 ) => {
 
     // FIX: nếu totalLessons nhỏ hơn mốc nhỏ nhất (10) thì findPassedThreshold
@@ -46,17 +50,15 @@ export const calculateRewardAmount = (
         throw new Error(`Invalid difficulty: ${difficulty}`);
     }
 
-    const milestoneRewards = Object.entries(rewardMilestones).reduce(
-        (acc, [percent, rewardRatio]) => {
-            acc[percent] =
-                baseRewardAmount *
+    const milestoneRewards = Object.fromEntries( // fromEntries bien array thanh object, entries bien object thanh array
+        Object.entries(rewardMilestones).map(([percent, rewardRatio]) => [
+            percent,
+            baseRewardAmount *
                 lessonCountScale.multiplier *
                 difficultyScale *
-                rewardRatio;
-            return acc;
-        },
-        {}
-    );
+                rewardRatio
+        ])
+    ) as Record<Milestone, number>;
 
     return {
         totalRewardCanClaim:
@@ -68,7 +70,7 @@ export const calculateRewardAmount = (
     };
 };
 
-export const calculateMilestoneReward = (percent, lessonProgress) => {
+export const calculateMilestoneReward = (percent : number, lessonProgress: UserLessonProgress) => {
     const highestMilestoneReceived = lessonProgress.highestMilestoneReceived
         ? Number(lessonProgress.highestMilestoneReceived)
         : null;
@@ -77,12 +79,16 @@ export const calculateMilestoneReward = (percent, lessonProgress) => {
     // ở evaluateAttempt.service.js -> startAttempt, nên field này luôn undefined)
     const milestoneRewards = lessonProgress.milestoneRewards ?? {};
 
-    const milestone = Object.keys(milestoneRewards)
+    const milestones = Object.keys(milestoneRewards)
         .map(Number)
+        .filter((m): m is Milestone => 
+            [50, 70, 80, 90, 100].includes(m as Milestone)
+        );
+
+    const milestone = milestones
         .sort((a, b) => a - b)
         .filter(m => percent >= m)
-        .pop(); // get the highest milestone reached
-
+        .pop();
     if (milestone === undefined) return null; // no milestone reached yet
     if (milestone === highestMilestoneReceived) return null; // already claimed this milestone
 

@@ -1,3 +1,5 @@
+export type skillLesson = "pitch" | "melody" | "interval" | "bassline" | "chord" | "scale";
+
 export type PitchQuestionType = 
     | "direction"     // lên / xuống
     | "compare"       // cao hơn / thấp hơn / bằng
@@ -28,3 +30,4 @@ export type PitchLesson = BaseLesson & {
 }
 export type Lesson =
     | PitchLesson
+    | BaseLesson
