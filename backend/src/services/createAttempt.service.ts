@@ -1,6 +1,6 @@
 import * as createQuestion from "./generators/Pitch.js"
 import type { PitchLesson,Lesson } from "../types/typeLesson.js";
-export const createAttempt = (lesson: Lesson) => {
+export const createAttempt = <T extends Lesson>(lesson: T) => {
 
     switch (lesson.skill) {
 

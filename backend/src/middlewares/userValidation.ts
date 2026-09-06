@@ -1,5 +1,5 @@
+import { z } from "zod";
 import { body, validationResult } from "express-validator";
-import profanity from "allprofanity";
 import { createAccessToken,createRefreshToken,setAuthCookies, } from "../libs/auth.lib.js";
 import bcrypt from "bcrypt";
 import PasswordSession from "../models/passwordSession.model.js";
@@ -22,51 +22,41 @@ const bannedWords = [
     "api",
 ];
 // Common validators
-const usernameValidator = () =>
-    body("username")
-        .isString()
-        .withMessage("Tên phải là chuỗi")
+const usernameValidator = z
+        .string({
+            error: "Tên phải là chuỗi",
+        })
         .trim()
-        .notEmpty()
-        .withMessage("Tên không được để trống")
+        .min(1, "Tên không được để trống")
+        .min(3, "Tên phải từ 3-30 ký tự")
+        .max(30, "Tên phải từ 3-30 ký tự")
 
-        .isLength({ min: 3, max: 30 })
-        .withMessage("Tên phải từ 3-30 ký tự")
-
-        .matches(/^[A-Za-z0-9_ ]+$/)
-        .withMessage("Tên chỉ được chứa chữ, số, khoảng trắng và _")
-
-        .custom(value => {
-            if (value.startsWith("_")) {
-                throw new Error("Không được bắt đầu bằng _");
-            }
-
-            if (value.endsWith("_")) {
-                throw new Error("Không được kết thúc bằng _");
-            }
-
-            if (/_{2,}/.test(value)) {
-                throw new Error("Không được có nhiều dấu _ liên tiếp");
-            }
-
-            return true;
-        })
-
-        .custom(value => {
-            if (bannedWords.some(word => value.toLowerCase().includes(word))) {
-                throw new Error("Tên chứa từ cấm");
-            }
-
-            return true;
-        })
-
-        .custom(value => {
-            if (profanity.check(value)) {
-                throw new Error("Tên chứa từ không phù hợp");
-            }
-
-            return true;
-});
+        .regex(
+            /^[A-Za-z0-9_ ]+$/,
+            "Tên chỉ được chứa chữ, số, khoảng trắng và _"
+        )
+        .refine(
+            value => !value.startsWith("_"),
+            "Không được bắt đầu bằng _"
+        )
+        .refine(
+            value => !value.endsWith("_"),
+            "Không được kết thúc bằng _"
+        )
+        .refine(
+            value => !/_{2,}/.test(value),
+            "Không được có nhiều dấu _ liên tiếp"
+        )
+        // .refine(
+        //     value => !bannedWords.some(
+        //         word => value.toLowerCase().includes(word)
+        //     ),
+        //     "Tên chứa từ cấm"
+        // )
+        // .refine(
+        //     value => !profanity.check(value),
+        //     "Tên chứa từ không phù hợp"
+        // );
 
 const emailValidator = () =>
     body("email")
@@ -148,7 +138,7 @@ const otpValidator = () =>
         .withMessage("OTP phải gồm đúng 6 chữ số");
 // REGISTER
 export const registerValidation = [
-    usernameValidator(),
+    usernameValidator,
     emailValidator(),
     passwordValidator(),
     passwordAgainValidator("password_again"),

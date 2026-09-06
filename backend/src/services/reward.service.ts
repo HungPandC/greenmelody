@@ -69,8 +69,11 @@ export const calculateRewardAmount = (
         milestoneRewards
     };
 };
-
-export const calculateMilestoneReward = (percent : number, lessonProgress: UserLessonProgress) => {
+type RewardResult = {
+    milestone: Milestone;
+    coin: number;
+};
+export const calculateMilestoneReward = (percent : number, lessonProgress: UserLessonProgress): RewardResult | null => {
     const highestMilestoneReceived = lessonProgress.highestMilestoneReceived
         ? Number(lessonProgress.highestMilestoneReceived)
         : null;
@@ -92,5 +95,14 @@ export const calculateMilestoneReward = (percent : number, lessonProgress: UserL
     if (milestone === undefined) return null; // no milestone reached yet
     if (milestone === highestMilestoneReceived) return null; // already claimed this milestone
 
-    return { milestone, coin: milestoneRewards[milestone] };
+    const coin = milestoneRewards[milestone];
+
+    if (coin === undefined) {
+        return null;
+    }
+
+    return {
+        milestone,
+        coin
+    };
 };

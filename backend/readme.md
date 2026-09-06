@@ -49,3 +49,11 @@ cơ chế  reward{
         -nếu vs các bài nhiều bài và khó thì có các mốc:
             50% - 75% - 100%
 }
+
+
+checkname{
+    2 loại cú pháp {
+        kiểm tra cú pháp,
+        xác thực ngữ nghĩa 
+    }
+}
