@@ -7,8 +7,10 @@ const LEET_MAP: Record<string, string> = {
     "4": "a",
     "5": "s",
     "7": "t",
+    "@": "a",
+    "$": "s",
+    "!": "i",
 };
-
 function removeSeparators(value: string): string {
     return value.replace(/[\s_.-]/g, "");
 }

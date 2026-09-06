@@ -3,7 +3,7 @@ import Attempt,{ AttemptModel } from "../models/attempt.model.js";
 import crypto from "crypto";
 import mongoose from "mongoose";
 import { createAttempt } from "./createAttempt.service.js";
-import { Allskill } from "../data/Allskill.js";
+import { Allskill } from "../data/music/Allskill.js";
 import { calculateMilestoneReward, calculateRewardAmount } from "./reward.service.js";
 import { addCoin } from "./economy.service.js";
 import { skillLesson } from '../types/typeLesson.js';

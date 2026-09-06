@@ -4,7 +4,7 @@ import { melody } from "../data/Eartraining/melody.ts";
 import { interval } from "../data/Eartraining/interval.ts";
 import { chord } from "../data/Eartraining/chord.ts";
 import { scale } from "../data/Eartraining/scale.ts";
-import { Allskill }  from "../data/Allskill.ts"
+import { Allskill }  from "../data/music/Allskill.js"
 
 export const getSkill = async (req, res) => {
     const { skill } = req.params;
