@@ -2,38 +2,30 @@ import type {
     UsernameModerationResult,
     ModerationReason
 } from "./types.js";
-import { checkProfanity } from "./rules/profanity.js";
-import { checkReservedUsername } from "./rules/reserved.js";
-import { checkImpersonation } from "./rules/impersonation.js";
-import { detectObfuscation } from "./obfuscation/detectObfuscation.js";
+
+import { collectModerationSignals } from "./collectModerationSignals.js";
+
+import { normalizeConfusable } from "./normalization/confusable.js";
+
+import { normalizeLeet } from "./normalization/leet.js";
+import { removeSeparators } from "./normalization/separator.js";
+
+
 export function moderateUsername(
     username: string
 ): UsernameModerationResult {
+const confusableNormalized = normalizeConfusable(username);
 
-    const reasons: ModerationReason[] = [];
+const leetNormalized = normalizeLeet(confusableNormalized);
 
-    if (checkReservedUsername(username)) {
-        reasons.push("RESERVED_NAME");
-    }
-    if (checkProfanity(username)) {
-        reasons.push("PROFANITY");
-    }
-    if (checkImpersonation(username)) {
-        reasons.push("IMPERSONATION");
-    }
-    if (detectObfuscation(username)) {
-        reasons.push("OBFUSCATION");
-    }
-    if (reasons.length > 0) {
-        return {
-            decision: "REJECT",
-            reasons,
-            score: 100,
-        };
-    }
-    return {
-        decision: "ALLOW",
-        reasons: [],
-        score: 0,
-    };
+const separatorNormalized = removeSeparators(leetNormalized);
+
+const normalizedUsername = separatorNormalized.toLowerCase();
+
+    const signals = collectModerationSignals(
+        normalizedUsername,
+        username
+    );
+
+    throw new Error("Scoring not implemented yet");
 }

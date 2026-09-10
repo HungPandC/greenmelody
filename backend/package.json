@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "tsx index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "generate:profanity": "tsx /home/pc/Documents/greenmelody/backend/src/middlewares/usernameModeration/generateProfanityWords.ts"
   },
   "keywords": [],
   "author": "",
