@@ -23,6 +23,11 @@ for await (const line of file) {
         continue;
     }
 
+    const isSevere = item.severity >= 4 && (item.hate_speech || item.sexual || item.severity === 5);
+    if (!isSevere) {
+        continue;
+    }
+
     words.add(item.word);
 }
 
