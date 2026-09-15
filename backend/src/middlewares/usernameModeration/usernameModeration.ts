@@ -11,17 +11,22 @@ import { normalizeLeet } from "./normalization/leet.js";
 
 import { removeSeparators } from "./normalization/separator.js";
 
+import {normalizeUnicode,removeCombiningMarks} from "./normalization/unicode.js";
 
 export function moderateUsername(
     username: string
 ): UsernameModerationResult {
-const confusableNormalized = normalizeConfusable(username);
+    const unicodeNormalized = normalizeUnicode(username);
 
-const leetNormalized = normalizeLeet(confusableNormalized);
+    const removedCombiningMarks = removeCombiningMarks(unicodeNormalized); 
 
-const separatorNormalized = removeSeparators(leetNormalized);
+    const confusableNormalized = normalizeConfusable(removedCombiningMarks);
 
-const normalizedUsername = separatorNormalized.toLowerCase();
+    const leetNormalized = normalizeLeet(confusableNormalized);
+
+    const separatorNormalized = removeSeparators(leetNormalized);
+
+    const normalizedUsername = separatorNormalized.toLowerCase();
 
     const signals = collectModerationSignals(
         normalizedUsername,
