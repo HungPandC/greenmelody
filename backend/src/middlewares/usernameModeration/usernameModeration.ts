@@ -1,9 +1,10 @@
-import type {
-    UsernameModerationResult,
-    ModerationReason
-} from "./types.js";
+import type { UsernameModerationResult } from "./types.js";
 
 import { collectModerationSignals } from "./collectModerationSignals.js";
+
+import { calculateModerationScore } from "./scoring.js";
+
+import { normalizeUnicode, removeCombiningMarks } from "./normalization/unicode.js";
 
 import { normalizeConfusable } from "./normalization/confusable.js";
 
@@ -11,27 +12,31 @@ import { normalizeLeet } from "./normalization/leet.js";
 
 import { removeSeparators } from "./normalization/separator.js";
 
-import {normalizeUnicode,removeCombiningMarks} from "./normalization/unicode.js";
 
 export function moderateUsername(
     username: string
 ): UsernameModerationResult {
-    const unicodeNormalized = normalizeUnicode(username);
+const nfkcNormalized = normalizeUnicode(username);
 
-    const removedCombiningMarks = removeCombiningMarks(unicodeNormalized); 
+const combiningMarksRemoved = removeCombiningMarks(nfkcNormalized);
 
-    const confusableNormalized = normalizeConfusable(removedCombiningMarks);
+const confusableNormalized = normalizeConfusable(combiningMarksRemoved);
 
-    const leetNormalized = normalizeLeet(confusableNormalized);
+const leetNormalized = normalizeLeet(confusableNormalized);
 
-    const separatorNormalized = removeSeparators(leetNormalized);
+// Bản còn separator - dùng để tokenize theo từng từ (profanity, impersonation)
+const tokenizableUsername = leetNormalized.toLowerCase();
 
-    const normalizedUsername = separatorNormalized.toLowerCase();
+const separatorNormalized = removeSeparators(leetNormalized);
+
+// Bản đã xóa separator - dùng để match chính xác (reserved, brand+authority, substring)
+const normalizedUsername = separatorNormalized.toLowerCase();
 
     const signals = collectModerationSignals(
         normalizedUsername,
+        tokenizableUsername,
         username
     );
 
-    throw new Error("Scoring not implemented yet");
+    return calculateModerationScore(signals);
 }

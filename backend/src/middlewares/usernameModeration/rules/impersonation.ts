@@ -1,18 +1,23 @@
 import { IMPERSONATION_WORDS } from "../constants.js";
 import { tokenizeUsername } from "./tokenize.js";
-import { checkBrandAuthorityPattern } from "./impersonationPatterns.js";
+import type { ModerationMatch } from "../types.js";
 
-export function checkImpersonation(username: string): boolean {
-    const normalizedUsername = username;
-
-    const tokens = tokenizeUsername(normalizedUsername);
+// Chỉ check token = đúng 1 từ authority (admin, official, ...).
+// hasBrandAuthority (brand + authority ghép) đã được context.ts xử lý riêng
+// trên bản normalizedUsername (đã xóa separator) - không lặp lại ở đây.
+export function checkImpersonation(username: string): ModerationMatch[] {
+    const tokens = tokenizeUsername(username);
 
     const hasAuthorityToken = IMPERSONATION_WORDS.some(word =>
         tokens.includes(word)
     );
 
-    const matchesBrandAuthority =
-        checkBrandAuthorityPattern(normalizedUsername);
+    if (!hasAuthorityToken) return [];
 
-    return hasAuthorityToken || matchesBrandAuthority;
+    return [{
+        type: "IMPERSONATION",
+        language: "unknown",
+        severity: "HIGH",
+        confidence: 1,
+    }];
 }

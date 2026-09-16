@@ -116,6 +116,16 @@ for (const line of content.split(/\r?\n/)) {
         continue;
     }
 
+    // Chỉ giữ mapping 1 ký tự -> 1 ký tự (VD: cyrillic "а" -> latin "a").
+    // Confusables.txt còn có các cặp 1 -> nhiều ký tự (VD: "m" -> "rn"),
+    // dùng cho thuật toán "skeleton" đầy đủ của Unicode. Hệ thống này
+    // không dùng thuật toán đó - nếu giữ lại, normalizeConfusable sẽ làm
+    // lệch độ dài chuỗi (VD: "admin" -> "adrnin"), khiến exact-match với
+    // reserved/impersonation/profanity list KHÔNG BAO GIỜ khớp được nữa
+    // với những từ có chứa ký tự "m".
+    if (source.length !== 1 || target.length !== 1) {
+        continue;
+    }
 
     map.set(source, target);
 }

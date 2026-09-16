@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { body, validationResult } from "express-validator";
 import { createAccessToken,createRefreshToken,setAuthCookies, } from "../libs/auth.lib.js";
 import bcrypt from "bcrypt";
 import PasswordSession from "../models/passwordSession.model.js";
@@ -10,157 +9,142 @@ import jwt, {
     TokenExpiredError,
     JsonWebTokenError
 } from "jsonwebtoken";
+// Đường dẫn này chỉnh lại cho đúng vị trí thật của usernameModeration.ts
+// so với file này.
+import { moderateUsername } from "../middlewares/usernameModeration/usernameModeration.js";
 
-const bannedWords = [
-    "admin",
-    "administrator",
-    "root",
-    "support",
-    "staff",
-    "owner",
-    "system",
-    "api",
-];
-// Common validators
-const usernameValidator = z
-        .string({
-            error: "Tên phải là chuỗi",
-        })
-        .trim()
-        .min(1, "Tên không được để trống")
-        .min(3, "Tên phải từ 3-30 ký tự")
-        .max(30, "Tên phải từ 3-30 ký tự")
+// =====================================================
+// Schemas riêng từng field
+// =====================================================
 
-        .regex(
-            /^[A-Za-z0-9_ ]+$/,
-            "Tên chỉ được chứa chữ, số, khoảng trắng và _"
-        )
-        .refine(
-            value => !value.startsWith("_"),
-            "Không được bắt đầu bằng _"
-        )
-        .refine(
-            value => !value.endsWith("_"),
-            "Không được kết thúc bằng _"
-        )
-        .refine(
-            value => !/_{2,}/.test(value),
-            "Không được có nhiều dấu _ liên tiếp"
-        )
-        // .refine(
-        //     value => !bannedWords.some(
-        //         word => value.toLowerCase().includes(word)
-        //     ),
-        //     "Tên chứa từ cấm"
-        // )
-        // .refine(
-        //     value => !profanity.check(value),
-        //     "Tên chứa từ không phù hợp"
-        // );
+const usernameSchema = z
+    .string({ error: "Tên phải là chuỗi" })
+    .trim()
+    .min(3, "Tên phải từ 3-30 ký tự")
+    .max(30, "Tên phải từ 3-30 ký tự")
+    .regex(
+        /^[A-Za-z0-9_ ]+$/,
+        "Tên chỉ được chứa chữ, số, khoảng trắng và _"
+    )
+    .refine(value => !value.startsWith("_"), "Không được bắt đầu bằng _")
+    .refine(value => !value.endsWith("_"), "Không được kết thúc bằng _")
+    .refine(value => !/_{2,}/.test(value), "Không được có nhiều dấu _ liên tiếp")
+    .refine(
+        value => moderateUsername(value).decision !== "REJECT",
+        "Tên chứa từ không phù hợp"
+    );
 
-const emailValidator = () =>
-    body("email")
-        .isString()
-        .withMessage("Email phải là chuỗi")
-        .trim()
-        .normalizeEmail()
-        .notEmpty()
-        .withMessage("Email không được để trống")
-        .isEmail()
-        .withMessage("Email không hợp lệ")
-        .isLength({ max: 254 })
-        .withMessage("Email quá dài")
+const emailSchema = z
+    .string({ error: "Email phải là chuỗi" })
+    .trim()
+    .toLowerCase()
+    .min(1, "Email không được để trống")
+    .max(254, "Email quá dài")
+    .email("Email không hợp lệ")
+    .refine(value => !/\s/.test(value), "Email không được chứa khoảng trắng");
 
-        .custom(value => {
-            if (/\s/.test(value)) {
-                throw new Error("Email không được chứa khoảng trắng");
-            }
+// Mật khẩu mạnh - dùng cho register và reset password
+const strongPasswordSchema = z
+    .string({ error: "Mật khẩu phải là chuỗi" })
+    .min(1, "Mật khẩu không được để trống")
+    .min(8, "Mật khẩu phải từ 8-64 ký tự")
+    .max(64, "Mật khẩu phải từ 8-64 ký tự")
+    .refine(value => /[a-z]/.test(value), "Phải có ít nhất 1 chữ thường")
+    .refine(value => /[A-Z]/.test(value), "Phải có ít nhất 1 chữ hoa")
+    .refine(value => /[0-9]/.test(value), "Phải có ít nhất 1 số")
+    .refine(
+        value => /[!@#$%^&*()_\-+=\[\]{};:'",.<>/?\\|`~]/.test(value),
+        "Phải có ít nhất 1 ký tự đặc biệt"
+    )
+    .refine(value => !/\s/.test(value), "Mật khẩu không được chứa khoảng trắng");
 
-            return true;
+// Mật khẩu login - chỉ check tồn tại + độ dài, không check độ mạnh
+// (mật khẩu cũ có thể được tạo từ trước khi có rule mạnh hơn)
+const loginPasswordSchema = z
+    .string({ error: "Mật khẩu phải là chuỗi" })
+    .min(1, "Mật khẩu không được để trống")
+    .max(200, "Mật khẩu quá dài");
+
+const otpSchema = z
+    .string({ error: "OTP phải là chuỗi" })
+    .trim()
+    .regex(/^\d{6}$/, "OTP phải gồm đúng 6 chữ số");
+
+// =====================================================
+// Schema tổng hợp từng route + check passwordAgain khớp password
+// =====================================================
+
+const registerSchema = z
+    .object({
+        username: usernameSchema,
+        email: emailSchema,
+        password: strongPasswordSchema,
+        password_again: z.string({ error: "Vui lòng xác nhận mật khẩu" }),
+    })
+    .refine(data => data.password_again === data.password, {
+        message: "Mật khẩu xác nhận không khớp",
+        path: ["password_again"],
+    });
+
+const loginSchema = z.object({
+    email: emailSchema,
+    password: loginPasswordSchema,
 });
 
-const passwordValidator = (field = "password") =>
-    body(field)
-        .isString()
-        .withMessage("Mật khẩu phải là chuỗi")
-        .notEmpty()
-        .withMessage("Mật khẩu không được để trống")
-
-        .isLength({ min: 8, max: 64 })
-        .withMessage("Mật khẩu phải từ 8-64 ký tự")
-
-        .matches(/[a-z]/)
-        .withMessage("Phải có ít nhất 1 chữ thường")
-
-        .matches(/[A-Z]/)
-        .withMessage("Phải có ít nhất 1 chữ hoa")
-
-        .matches(/[0-9]/)
-        .withMessage("Phải có ít nhất 1 số")
-
-        .matches(/[!@#$%^&*()_\-+=\[\]{};:'",.<>/?\\|`~]/)
-        .withMessage("Phải có ít nhất 1 ký tự đặc biệt")
-
-        .custom(value => {
-            if (/\s/.test(value)) {
-                throw new Error("Mật khẩu không được chứa khoảng trắng");
-            }
-
-    return true;
-});
-const passwordAgainValidator = (field = "passwordAgain",target = "password") =>
-    body(field)
-        .notEmpty()
-        .withMessage("Vui lòng xác nhận mật khẩu")
-
-        .custom((value, { req }) => {
-            if (value !== req.body[target]) {
-                throw new Error("Mật khẩu xác nhận không khớp");
-            }
-    return true;
+const verifyOtpSchema = z.object({
+    otp: otpSchema,
 });
 
-const loginPasswordValidator = () =>
-    body("password")
-        .notEmpty()
-        .withMessage("Mật khẩu không được để trống")
+const forgotPasswordSchema = z.object({
+    email: emailSchema,
+});
 
-        .isLength({ max: 200 })
-        .withMessage("Mật khẩu quá dài");
+// Lưu ý: bản express-validator cũ dùng loginPasswordValidator (chỉ check
+// độ dài) cho reset password, không check độ mạnh như register - có vẻ là
+// sót chứ không phải cố ý, nên ở đây đổi sang strongPasswordSchema cho
+// đúng ý nghĩa "đặt mật khẩu mới".
+const resetPasswordSchema = z
+    .object({
+        password: strongPasswordSchema,
+        passwordAgain: z.string({ error: "Vui lòng xác nhận mật khẩu" }),
+    })
+    .refine(data => data.passwordAgain === data.password, {
+        message: "Mật khẩu xác nhận không khớp",
+        path: ["passwordAgain"],
+    });
 
-const otpValidator = () =>
-    body("otp")
-        .isString()
-        .withMessage("OTP phải là chuỗi")
-        .trim()
-        .notEmpty()
-        .matches(/^\d{6}$/)
-        .withMessage("OTP phải gồm đúng 6 chữ số");
-// REGISTER
-export const registerValidation = [
-    usernameValidator,
-    emailValidator(),
-    passwordValidator(),
-    passwordAgainValidator("password_again"),
-];
+// =====================================================
+// Middleware factory - nối zod schema vào Express
+// =====================================================
 
-// LOGIN
-export const loginValidation = [
-    emailValidator(),
-    loginPasswordValidator(),
-];
+function validateBody(schema: z.ZodType): RequestHandler {
+    return (req, res, next) => {
+        const result = schema.safeParse(req.body);
 
-// VERIFY OTP
-export const verifyOtpValidation = [
-    otpValidator(),
-];
-export const forgotPasswordValidation = [
-    emailValidator(),
-]
-export const resetPasswordValidation = [
-    loginPasswordValidator(),
-    passwordAgainValidator(),
-]
+        if (!result.success) {
+            return res.status(400).json({
+                errors: result.error.issues.map(issue => ({
+                    path: issue.path.join("."),
+                    msg: issue.message,
+                })),
+            });
+        }
+
+        req.body = result.data;
+        next();
+    };
+}
+
+// =====================================================
+// Export - giữ tên cũ, vẫn là mảng để chỗ dùng ...spread không vỡ
+// =====================================================
+
+export const registerValidation = [validateBody(registerSchema)];
+export const loginValidation = [validateBody(loginSchema)];
+export const verifyOtpValidation = [validateBody(verifyOtpSchema)];
+export const forgotPasswordValidation = [validateBody(forgotPasswordSchema)];
+export const resetPasswordValidation = [validateBody(resetPasswordSchema)];
+
 export const logout: RequestHandler = (req, res) => {
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
@@ -170,23 +154,8 @@ export const logout: RequestHandler = (req, res) => {
     });
 };
 
-export const checkValidation : RequestHandler = (
-    req,
-    res,
-    next
-) => {
-    const result = validationResult(req);
-
-    if (!result.isEmpty()) {
-        return res.status(400).json({
-            errors: result.array()
-        });
-    }
-
-    next();
-}
 // =====================================================
-// Authenticate
+// Authenticate - GIỮ NGUYÊN, không đụng vào
 // =====================================================
 
 export const authenticate: RequestHandler = async (req, res, next) => {
@@ -200,10 +169,6 @@ export const authenticate: RequestHandler = async (req, res, next) => {
     }
 
     try {
-
-        // =================================================
-        // 1. Access token còn hạn
-        // =================================================
 
         const decoded = jwt.verify(
             token,
@@ -222,10 +187,6 @@ export const authenticate: RequestHandler = async (req, res, next) => {
 
     } catch (error) {
 
-        // =================================================
-        // 2. Access token hết hạn
-        // =================================================
-
         if (error instanceof TokenExpiredError) {
 
             try {
@@ -238,10 +199,6 @@ export const authenticate: RequestHandler = async (req, res, next) => {
                     });
                 }
 
-                // =================================================
-                // Verify refresh token
-                // =================================================
-
                 const decodedRefresh = jwt.verify(
                     refresh,
                     process.env.JWT_SECRET_REFRESH as string
@@ -252,10 +209,6 @@ export const authenticate: RequestHandler = async (req, res, next) => {
                         message: "Refresh token không hợp lệ"
                     });
                 }
-
-                // =================================================
-                // 3. Tìm session tương ứng
-                // =================================================
 
                 const session = await PasswordSession.findOne({
                     sessionId: decodedRefresh.sessionId,
@@ -269,15 +222,7 @@ export const authenticate: RequestHandler = async (req, res, next) => {
                     });
                 }
 
-                // =================================================
-                // 4. Rotation refresh token
-                // =================================================
-
                 const now = new Date();
-
-                // 30 giây để test
-                // Sau này có thể đổi thành:
-                // const IDLE_TIMEOUT = 30 * 24 * 60 * 60 * 1000;
 
                 const IDLE_TIMEOUT = 30 * 1000;
 
@@ -294,10 +239,6 @@ export const authenticate: RequestHandler = async (req, res, next) => {
                     });
                 }
 
-                // =================================================
-                // Absolute expiration
-                // =================================================
-
                 if (now >= session.absoluteExpiresAt) {
 
                     session.revoked = true;
@@ -307,10 +248,6 @@ export const authenticate: RequestHandler = async (req, res, next) => {
                         message: "Phiên đăng nhập đã hết hạn"
                     });
                 }
-
-                // =================================================
-                // Kiểm tra refresh token hiện tại
-                // =================================================
 
                 const isValidRefreshToken = await bcrypt.compare(
                     refresh,
@@ -327,22 +264,10 @@ export const authenticate: RequestHandler = async (req, res, next) => {
                     });
                 }
 
-                // =================================================
-                // Revoke session cũ
-                // =================================================
-
                 session.revoked = true;
                 await session.save();
 
-                // =================================================
-                // Tạo sessionId mới
-                // =================================================
-
                 const newSessionId = randomUUID();
-
-                // =================================================
-                // Tạo token mới
-                // =================================================
 
                 const newAccessToken = createAccessToken(
                     decodedRefresh.userId
@@ -353,18 +278,10 @@ export const authenticate: RequestHandler = async (req, res, next) => {
                     sessionId: newSessionId
                 });
 
-                // =================================================
-                // Hash refresh token mới
-                // =================================================
-
                 const newRefreshTokenHash = await bcrypt.hash(
                     newRefreshToken,
                     10
                 );
-
-                // =================================================
-                // Tạo PasswordSession mới
-                // =================================================
 
                 await PasswordSession.create({
                     sessionId: newSessionId,
@@ -375,19 +292,11 @@ export const authenticate: RequestHandler = async (req, res, next) => {
                     revoked: false
                 });
 
-                // =================================================
-                // Ghi cookie mới
-                // =================================================
-
                 setAuthCookies(
                     res,
                     newAccessToken,
                     newRefreshToken
                 );
-
-                // =================================================
-                // Cho request tiếp tục
-                // =================================================
 
                 req.user = {
                     userId: decodedRefresh.userId,
@@ -400,21 +309,18 @@ export const authenticate: RequestHandler = async (req, res, next) => {
 
             } catch (err) {
 
-                // Refresh token hết hạn
                 if (err instanceof TokenExpiredError) {
                     return res.status(401).json({
                         message: "Refresh token đã hết hạn"
                     });
                 }
 
-                // Refresh token không hợp lệ
                 if (err instanceof JsonWebTokenError) {
                     return res.status(401).json({
                         message: "Refresh token không hợp lệ"
                     });
                 }
 
-                // Lỗi không xác định
                 console.error(err);
 
                 return res.status(401).json({
@@ -423,20 +329,12 @@ export const authenticate: RequestHandler = async (req, res, next) => {
             }
         }
 
-        // =================================================
-        // 3. Access token sai
-        // =================================================
-
         if (error instanceof JsonWebTokenError) {
 
             return res.status(401).json({
                 message: "Token không hợp lệ"
             });
         }
-
-        // =================================================
-        // 4. Lỗi không xác định
-        // =================================================
 
         console.error(error);
 

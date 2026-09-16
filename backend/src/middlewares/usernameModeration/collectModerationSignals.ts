@@ -7,6 +7,7 @@ import type { ModerationSignals } from "./types.js";
 
 export function collectModerationSignals(
     normalizedUsername: string,
+    tokenizableUsername: string,
     originalUsername: string
 ): ModerationSignals {
 
@@ -14,9 +15,11 @@ export function collectModerationSignals(
 
     return {
         reserved: checkReservedUsername(normalizedUsername),
-        profanity: checkProfanity(normalizedUsername),
-        impersonation: checkImpersonation(normalizedUsername),
         obfuscation: detectObfuscation(originalUsername),
+        matches: [
+            ...checkProfanity(tokenizableUsername),
+            ...checkImpersonation(tokenizableUsername),
+        ],
         hasAuthoritySubstring: context.hasAuthoritySubstring,
         hasBrand: context.hasBrand,
         hasBrandAuthority: context.hasBrandAuthority,

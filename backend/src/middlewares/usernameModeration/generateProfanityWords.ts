@@ -1,8 +1,15 @@
 import fs from "node:fs";
 import readline from "node:readline";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const input = "./src/middlewares/usernameModeration/profanityBench.jsonl";
-const output = "./src/middlewares/usernameModeration/profanityWords.generated.ts";
+// Tự tính path dựa vào vị trí thật của file này, chạy từ đâu cũng đúng
+// (không còn phụ thuộc bạn đang đứng ở cwd nào khi gõ lệnh npx tsx ...)
+const dir = path.dirname(fileURLToPath(import.meta.url));
+// profanityBench.jsonl nằm ở backend/, cách script 3 cấp thư mục:
+// usernameModeration -> middlewares -> src -> backend
+const input = path.join(dir, "../../../profanityBench.jsonl");
+const output = path.join(dir, "profanityWords.generated.ts");
 
 // word -> severity (4 hoặc 5). Trước đây chỉ lưu Set<string>, mất hết
 // thông tin severity nên checkProfanity() không thể chấm điểm khác nhau
