@@ -4,15 +4,22 @@ import { generateTokens,setAuthCookies } from "../libs/auth.lib.js";
 import PasswordSession from "../models/passwordSession.model.js";
 import { randomUUID } from "node:crypto";
 import bcrypt from "bcrypt";
+import { RequestHandler } from "express";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-export const loginGoogleController = async (req , res) => {
+export const loginGoogleController: RequestHandler = async (req , res) => {
     try{
         const { idToken } = req.body;
+        const googleClientId = process.env.GOOGLE_CLIENT_ID_NEW;
+
+        if (!googleClientId) {
+            throw new Error("GOOGLE_CLIENT_ID_NEW is not configured");
+        }
+
         const ticket = await client.verifyIdToken({
             idToken,
-            audience: process.env.GOOGLE_CLIENT_ID_NEW,
+            audience: googleClientId,
         });
         if(!ticket){
             return res.status(400).json({message: "loi token"})
@@ -53,10 +60,10 @@ export const loginGoogleController = async (req , res) => {
         const sessionId = randomUUID();
 
         const { accessToken, refreshToken } =
-            generateTokens(
-                user._id.toString(),
+            generateTokens({
+                userId: user._id.toString(),
                 sessionId
-            );
+            });
         const refreshTokenHash = await bcrypt.hash(
             refreshToken,
             10

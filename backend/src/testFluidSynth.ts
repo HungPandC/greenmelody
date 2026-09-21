@@ -1,7 +1,7 @@
 import MidiWriter from "midi-writer-js";
 import path from "node:path";
 import fs from "node:fs";
-import { renderMidi } from "./services/fluidSynth";
+import { renderMidi } from "./services/fluidSynth.service.js";
 
 async function main() {
     const midiPath = path.resolve("test.mid");

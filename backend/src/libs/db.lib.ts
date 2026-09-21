@@ -6,7 +6,7 @@ export const connectDB = async (): Promise<void> => {
 
         console.log("✅ MongoDB đã kết nối thành công");
     } catch (error: unknown) {
-        console.log(process.env.MONGODB_URI);
+        // console.log(process.env.MONGODB_URI);
 
         if (error instanceof Error) {
             console.error("❌ Kết nối MongoDB thất bại:", error.message);

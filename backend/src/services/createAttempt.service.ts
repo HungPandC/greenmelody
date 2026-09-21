@@ -1,11 +1,14 @@
 import * as createQuestion from "./generators/Pitch.js"
 import type { PitchLesson,Lesson } from "../types/typeLesson.js";
+const isPitchLesson = (lesson: Lesson): lesson is PitchLesson => {
+    return lesson.skill === "pitch";
+};
 export const createAttempt = <T extends Lesson>(lesson: T) => {
-
     switch (lesson.skill) {
-
         case "pitch":
-            return createPitchAttempt(lesson);
+            if (isPitchLesson(lesson)) {
+                return createPitchAttempt(lesson);
+            }
 
         case "interval":
             // return createIntervalAttempt(lesson);

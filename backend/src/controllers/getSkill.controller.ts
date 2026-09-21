@@ -1,13 +1,27 @@
-import { pitch } from "../data/Eartraining/pitch.ts";
-import { bassline } from "../data/Eartraining/bassline.ts";
-import { melody } from "../data/Eartraining/melody.ts";
-import { interval } from "../data/Eartraining/interval.ts";
-import { chord } from "../data/Eartraining/chord.ts";
-import { scale } from "../data/Eartraining/scale.ts";
-import { Allskill }  from "../data/music/Allskill.js"
+import { RequestHandler } from "express";
+import { Allskill } from "../data/music/Allskill.js";
+import {skillLesson} from "../types/typeLesson.js";
+const VALID_SKILLS = [
+    "pitch",
+    "melody",
+    "interval",
+    "bassline",
+    "chord",
+    "scale",
+] as const;
 
-export const getSkill = async (req, res) => {
+export function isSkill(value: string): value is skillLesson {
+    return VALID_SKILLS.includes(value as skillLesson);
+}
+
+export const getSkill: RequestHandler<{ skill: string }> = async (req, res) => {
     const { skill } = req.params;
+
+    if (!isSkill(skill)) {
+        return res.status(400).json({
+            message: "Invalid skill parameter",
+        });
+    }
 
     const lessons = Allskill[skill];
 

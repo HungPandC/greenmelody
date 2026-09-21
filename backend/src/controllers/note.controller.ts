@@ -1,14 +1,11 @@
 import path from "node:path";
 import fs from "node:fs";
 import MidiWriter from "midi-writer-js";
-import { renderMidi } from "../services/fluidSynth";
-import Attempt from "../models/attempt.model";
-import {
-    generateHighestLowestPitchQuestion,
-    generatePitchDirectionQuestion
-} from "../services/generators/Pitch"
+import { renderMidi } from "../services/fluidSynth.service.js";
+import Attempt from "../models/attempt.model.js";
+import { RequestHandler } from "express";
 
-export const playNote = async(req,res)=> {
+export const playNote: RequestHandler = async(req,res)=> {
     const { pitch } = req.body; // vd: "C4"
 
     if (!pitch) {
@@ -41,11 +38,22 @@ export const playNote = async(req,res)=> {
         res.status(500).json({ error: "Render failed" });
     }
 }
-export const playAttemptPitch = async (req,res)=>{
+
+export const playAttemptPitch: RequestHandler = async (req, res) => {
     const userId = req.body;
+
     const { attemptId, questionIndex } = req.params;
-    const attempt = Attempt.findOne(
+
+    const attempt = await Attempt.findOne({
         attemptId,
-        userId
-    );
-}
+        userId,
+    });
+
+    if (!attempt) {
+        return res.status(404).json({
+            error: "Attempt not found",
+        });
+    }
+
+    // xử lý questionIndex ở đây
+};

@@ -5,10 +5,7 @@ import PasswordSession from "../models/passwordSession.model.js";
 import { randomUUID } from "node:crypto";
 import { RequestHandler } from "express";
 import { AccessTokenPayload,RefreshTokenPayload } from "../types/typeAuth.js";
-import jwt, {
-    TokenExpiredError,
-    JsonWebTokenError
-} from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 // Đường dẫn này chỉnh lại cho đúng vị trí thật của usernameModeration.ts
 // so với file này.
 import { moderateUsername } from "../middlewares/usernameModeration/usernameModeration.js";
@@ -187,7 +184,7 @@ export const authenticate: RequestHandler = async (req, res, next) => {
 
     } catch (error) {
 
-        if (error instanceof TokenExpiredError) {
+        if (error instanceof jwt.TokenExpiredError) {
 
             try {
 
@@ -309,13 +306,13 @@ export const authenticate: RequestHandler = async (req, res, next) => {
 
             } catch (err) {
 
-                if (err instanceof TokenExpiredError) {
+                if (err instanceof jwt.TokenExpiredError) {
                     return res.status(401).json({
                         message: "Refresh token đã hết hạn"
                     });
                 }
 
-                if (err instanceof JsonWebTokenError) {
+                if (err instanceof jwt.TokenExpiredError) {
                     return res.status(401).json({
                         message: "Refresh token không hợp lệ"
                     });
@@ -329,7 +326,7 @@ export const authenticate: RequestHandler = async (req, res, next) => {
             }
         }
 
-        if (error instanceof JsonWebTokenError) {
+        if (error instanceof jwt.TokenExpiredError) {
 
             return res.status(401).json({
                 message: "Token không hợp lệ"

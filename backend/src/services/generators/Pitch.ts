@@ -1,4 +1,4 @@
-import type { OctaveType,typeDifficultyDistance,typeDifficultyOctave } from "../../types/typeGenerators";
+import type { OctaveType,typeDifficultyDistance,typeDifficultyOctave } from "../../types/typeGenerators.js";
 
 
 const NOTES   = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];

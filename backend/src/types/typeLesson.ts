@@ -8,26 +8,25 @@ export type PitchQuestionType =
 export interface BaseLesson {
   id: string;
   title: string;
-  skill: string;
+  skill: skillLesson;
   order: number;
   questionCount: number;
-  difficulty: "easy" | "medium" | "hard"; // thêm dòng này
+  difficulty: "easy" | "medium" | "hard";
 }
 export type PitchLesson = BaseLesson & {
-    BaseDifficultyOctave:
-        | "easy"
-        | "medium"
-        | "hardHight"
-        | "hardLow"
-        | "extreme",
-
-    BaseDifficultyDistance:
-        | "easy"
-        | "medium"
-        | "hard",
-
-    type: PitchQuestionType,
-}
+  skill: "pitch";
+  BaseDifficultyOctave:
+    | "easy"
+    | "medium"
+    | "hardHight"
+    | "hardLow"
+    | "extreme";
+  BaseDifficultyDistance:
+    | "easy"
+    | "medium"
+    | "hard";
+  type: PitchQuestionType;
+};
 export type Lesson =
     | PitchLesson
     | BaseLesson

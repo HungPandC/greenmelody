@@ -1,7 +1,6 @@
 import { Router } from "express";
 import {
     registerValidation,
-    checkValidation,
     loginValidation,
     verifyOtpValidation,
     authenticate,
@@ -35,7 +34,6 @@ router.post(
     doubleCsrfProtection,
     registerLimiter,
     registerValidation,
-    checkValidation,
     authController.register
 );
 
@@ -43,7 +41,6 @@ router.post(
     "/sendOtp",
     doubleCsrfProtection,
     sendOtpLimiter,
-    checkValidation,
     authController.sendRegisterOtp
 );
 
@@ -52,7 +49,6 @@ router.post(
     doubleCsrfProtection,
     verifyOtpLimiter,
     verifyOtpValidation,
-    checkValidation,
     authController.verifyRegisterOTP
 );
 
@@ -62,7 +58,6 @@ router.post(
     loginLimiter,
     loginEmailLimiter,
     loginValidation,
-    checkValidation,
     authController.login
 );
 
@@ -96,7 +91,7 @@ router.put(
     doubleCsrfProtection,
     authenticate,
     changePasswordLimiter,
-    checkValidation,
+
     userController.changePasswordController
 );
 

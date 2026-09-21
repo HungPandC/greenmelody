@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx index.ts",
+    "dev": "tsx index.js",
     "build": "tsc",
     "start": "node dist/index.js",
     "generate:profanity": "tsx /home/pc/Documents/greenmelody/backend/src/middlewares/usernameModeration/generateProfanityWords.ts"

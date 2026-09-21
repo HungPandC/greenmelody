@@ -6,9 +6,10 @@ import PendingUser from "../models/pendingUser.model.js";
 import { randomUUID } from "node:crypto";
 import PasswordReset from "../models/passwordSession.model.js";
 import PasswordResetSession from "../models/passwordResetSession.model.js";
+import { RequestHandler } from "express";
 
 
-export const changePasswordController = async (req, res) => {
+export const changePasswordController: RequestHandler = async (req, res) => {
     try {
         const { oldPass, newPass, confirmPass } = req.body;
 
@@ -28,7 +29,11 @@ export const changePasswordController = async (req, res) => {
                 message: "Không tìm thấy người dùng",
             });
         }
-
+        if ( !user.hashedPassword) {
+            return res.status(400).json({
+                message: "Người dùng không có mật khẩu để thay đổi",
+            });
+        }
         // Kiểm tra mật khẩu cũ
         const isMatch = await bcrypt.compare(
             oldPass,
@@ -76,7 +81,7 @@ export const changePasswordController = async (req, res) => {
         });
     }
 };
-export const forgotPasswordController = async (req, res) => {
+export const forgotPasswordController: RequestHandler = async (req, res) => {
     try {
         const { email } = req.body;
 
@@ -135,7 +140,7 @@ export const forgotPasswordController = async (req, res) => {
 };
 
 
-export const sendResetOtpController = async (req, res) => {
+export const sendResetOtpController: RequestHandler = async (req, res) => {
     try {
         const sessionId = req.cookies.otp_session_forgot;
 
@@ -201,7 +206,7 @@ export const sendResetOtpController = async (req, res) => {
         });
     }
 };
-export const verifyResetOtpController = async (req, res) => {
+export const verifyResetOtpController: RequestHandler = async (req, res) => {
     try {
         const { otp } = req.body;
         const sessionId = req.cookies.otp_session_forgot;
@@ -272,7 +277,7 @@ export const verifyResetOtpController = async (req, res) => {
         });
     }
 };
-export const resetPasswordController = async (req, res) => {
+export const resetPasswordController: RequestHandler = async (req, res) => {
     try {
         const { newPassword, newPasswordAgain } = req.body;
         const sessionId = req.cookies.otp_session_forgot;
@@ -329,7 +334,12 @@ export const resetPasswordController = async (req, res) => {
                 message: "Không tìm thấy người dùng."
             });
         }
-
+        if (!user.hashedPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Người dùng không có mật khẩu để đặt lại."
+            });
+        }
         const isSamePassword = await bcrypt.compare(
             newPassword,
             user.hashedPassword
